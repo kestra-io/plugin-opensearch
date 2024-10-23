@@ -1,9 +1,10 @@
+openSearch-hosts:
+  - http://localhost:9200
+
 kestra:
-  repository:
-    type: memory
-  queue:
-    type: memory
   storage:
     type: local
     local:
       base-path: /tmp/unittest
+  queue:
+    type: memory
