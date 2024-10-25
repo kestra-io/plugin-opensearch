@@ -26,7 +26,7 @@ sourceCompatibility = 21
 targetCompatibility = 21
 
 group "io.kestra.plugin"
-description 'Plugin template for Kestra'
+description 'Connect Opensearch search and analytics engine to Kestra workflows.'
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
@@ -47,6 +47,14 @@ dependencies {
     annotationProcessor group: "io.kestra", name: "processor", version: kestraVersion
     compileOnly group: "io.kestra", name: "core", version: kestraVersion
     compileOnly group: "io.kestra", name: "script", version: kestraVersion
+
+    // Libs
+    api (group: 'org.opensearch.client', name: 'opensearch-java') {
+        exclude group: 'org.apache.logging.log4j'
+    }
+    api (group: 'org.opensearch.client', name: 'opensearch-rest-client') {
+        exclude group: 'org.apache.logging.log4j'
+    }
 }
 
 
