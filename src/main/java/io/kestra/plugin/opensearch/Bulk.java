@@ -1,5 +1,6 @@
 package io.kestra.plugin.opensearch;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kestra.core.models.annotations.Example;
@@ -65,16 +66,34 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
     @Override
     protected Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IOException {
         return Flux
-            .create(this.esNdJSonReader(inputStream), FluxSink.OverflowStrategy.BUFFER);
+            .create(this.fileReader(inputStream), FluxSink.OverflowStrategy.BUFFER);
     }
 
     @SuppressWarnings("unchecked")
-    public Consumer<FluxSink<BulkOperation>> esNdJSonReader(BufferedReader input) throws IOException {
+    public Consumer<FluxSink<BulkOperation>> fileReader(BufferedReader input) throws IOException {
         return throwConsumer(s -> {
             String row;
+            Boolean isJson = null;
 
             while ((row = input.readLine()) != null) {
-                Map.Entry<String, Object> operation = JacksonMapper.toMap(row).entrySet().iterator().next();
+                // validate if it's json or ion
+                if (isJson == null) {
+                    try {
+                        OBJECT_MAPPER.readTree(row);
+                        isJson = true;
+                    } catch (JacksonException e) {
+                        isJson = false;
+                    }
+                }
+
+                Map<String, Object> data;
+                if (isJson) {
+                    data = JacksonMapper.toMap(row);
+                } else {
+                    data = JacksonMapper.ofIon().readValue(row, JacksonMapper.MAP_TYPE_REFERENCE);
+                }
+
+                Map.Entry<String, Object> operation = data.entrySet().iterator().next();
                 Map<String, Object> value = (Map<String, Object>) operation.getValue();
 
                 var bulkOperation = new BulkOperation.Builder();
@@ -84,7 +103,7 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
                         var indexOperation = new IndexOperation.Builder<>()
                             .id((String) value.get("_id"))
                             .index((String) value.get("_index"))
-                            .document(parseline(input.readLine()));
+                            .document(parseline(isJson, input.readLine()));
                         bulkOperation.index(indexOperation.build());
                         break;
                     case "create":
@@ -92,7 +111,7 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
                             .id((String) value.get("_id"))
                             .index((String) value.get("_index"))
                             .ifPrimaryTerm(0L) //FIXME opType
-                            .document(parseline(input.readLine()));
+                            .document(parseline(isJson, input.readLine()));
                         bulkOperation.create(createOperation.build());
                         break;
                     case "update":
@@ -100,7 +119,7 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
                             .id((String) value.get("_id"))
                             .index((String) value.get("_index"))
                             .docAsUpsert(true)
-                            .document(parseline(input.readLine()));
+                            .document(parseline(isJson, input.readLine()));
                         bulkOperation.update(updateOperation.build());
                         break;
                     case "delete":
@@ -120,7 +139,11 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
         });
     }
 
-    private Map<?,?> parseline(String line) throws JsonProcessingException {
-        return  OBJECT_MAPPER.readValue(line, JacksonMapper.MAP_TYPE_REFERENCE);
+    private static Map<?,?> parseline(Boolean isJson, String line) throws JsonProcessingException {
+        if (isJson) {
+            return OBJECT_MAPPER.readValue(line, JacksonMapper.MAP_TYPE_REFERENCE);
+        } else {
+            return JacksonMapper.ofIon().readValue(line, JacksonMapper.MAP_TYPE_REFERENCE);
+        }
     }
 }
