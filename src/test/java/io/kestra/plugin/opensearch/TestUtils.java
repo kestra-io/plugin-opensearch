@@ -27,7 +27,7 @@ final class TestUtils {
         if (!gbif.value()) {
             // use a bulk task to init the index
             try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("gbif_data.json")) {
-                URI uri = storageInterface.put(null, URI.create("/" + IdUtils.create() + ".ion"), resourceAsStream);
+                URI uri = storageInterface.put(null, null, URI.create("/" + IdUtils.create() + ".ion"), resourceAsStream);
 
                 Bulk put = Bulk.builder()
                     .connection(connection)
