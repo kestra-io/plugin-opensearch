@@ -44,7 +44,7 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
                     type: io.kestra.plugin.opensearch.Request
                     connection:
                       hosts:
-                       - "http://localhost:9200"
+                        - "http://localhost:9200"
                     method: "POST"
                     endpoint: "my_index/_doc/john"
                     body:
@@ -63,7 +63,7 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
                     type: io.kestra.plugin.opensearch.Request
                     connection:
                       hosts:
-                       - "http://localhost:9200"
+                        - "http://localhost:9200"
                     method: "GET"
                     endpoint: "my_index/_search"
                     parameters:
