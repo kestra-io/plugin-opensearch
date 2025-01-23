@@ -38,7 +38,7 @@ import jakarta.validation.constraints.NotNull;
                     type: io.kestra.plugin.opensearch.Get
                     connection:
                       hosts:
-                       - "http://localhost:9200"
+                        - "http://localhost:9200"
                     index: "my_index"
                     key: "my_id"
                 """

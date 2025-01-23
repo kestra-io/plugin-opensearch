@@ -54,7 +54,7 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
                     type: io.kestra.plugin.opensearch.Bulk
                     connection:
                       hosts:
-                       - "http://localhost:9200"
+                        - "http://localhost:9200"
                     from: "{{ inputs.file }}"
                 """
         )
