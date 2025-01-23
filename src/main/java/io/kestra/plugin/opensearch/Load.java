@@ -47,7 +47,7 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
                     type: io.kestra.plugin.opensearch.Load
                     connection:
                       hosts:
-                       - "http://localhost:9200"
+                        - "http://localhost:9200"
                     from: "{{ inputs.file }}"
                     index: "my_index"
                 """
