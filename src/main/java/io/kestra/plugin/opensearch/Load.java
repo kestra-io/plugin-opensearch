@@ -4,6 +4,7 @@ import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.FileSerde;
@@ -59,28 +60,24 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
     @Schema(
         title = "The OpenSearch index."
     )
-    @PluginProperty(dynamic = true)
     @NotNull
-    private String index;
+    private Property<String> index;
 
     @Schema(
         title = "Sets the type of operation to perform."
     )
-    @PluginProperty
-    private OpType opType;
+    private Property<OpType> opType;
 
     @Schema(
         title = "Use this key as id."
     )
-    @PluginProperty(dynamic = true)
-    private String idKey;
+    private Property<String> idKey;
 
     @Schema(
         title = "Remove idKey from the final document."
     )
-    @PluginProperty(dynamic = true)
     @Builder.Default
-    private Boolean removeIdKey = true;
+    private Property<Boolean> removeIdKey = Property.of(true);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -91,7 +88,7 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
 
                 var indexRequest = new IndexOperation.Builder<Map<String, ?>>();
                 if (this.index != null) {
-                    indexRequest.index(runContext.render(this.getIndex()));
+                    indexRequest.index(runContext.render(this.getIndex()).as(String.class).orElseThrow());
                 }
 
                 //FIXME
@@ -100,11 +97,11 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
 //                }
 
                 if (this.idKey != null) {
-                    String idKey = runContext.render(this.idKey);
+                    String idKey = runContext.render(this.idKey).as(String.class).orElseThrow();
 
                     indexRequest.id(values.get(idKey).toString());
 
-                    if (this.removeIdKey) {
+                    if (Boolean.TRUE.equals(runContext.render(removeIdKey).as(Boolean.class).orElseThrow())) {
                         values.remove(idKey);
                     }
                 }

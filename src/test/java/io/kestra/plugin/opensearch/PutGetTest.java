@@ -1,6 +1,7 @@
 package io.kestra.plugin.opensearch;
 
 import com.google.common.collect.ImmutableMap;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.utils.IdUtils;
@@ -30,17 +31,17 @@ class PutGetTest {
         String indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
 
         Put put = Put.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .index(indice)
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .index(Property.of(indice))
             .value("{{ variable }}")
             .build();
 
         Put.Output putOutput = put.run(runContext);
 
         Get task = Get.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .index(indice)
-            .key(putOutput.getId())
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .index(Property.of(indice))
+            .key(Property.of(putOutput.getId()))
             .build();
 
         Get.Output runOutput = task.run(runContext);
@@ -48,8 +49,8 @@ class PutGetTest {
         assertThat(runOutput.getRow().get("name"), is("John Doe"));
 
         put = Put.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .index(indice)
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .index(Property.of(indice))
             .value(Map.of(
                 "name", "Jane Doe"
             ))
@@ -58,9 +59,9 @@ class PutGetTest {
         putOutput = put.run(runContext);
 
         task = Get.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .index(indice)
-            .key(putOutput.getId())
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .index(Property.of(indice))
+            .key(Property.of(putOutput.getId()))
             .build();
 
         runOutput = task.run(runContext);

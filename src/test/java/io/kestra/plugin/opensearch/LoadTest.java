@@ -1,6 +1,7 @@
 package io.kestra.plugin.opensearch;
 
 import com.google.common.collect.ImmutableMap;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.serializers.FileSerde;
@@ -50,11 +51,11 @@ class LoadTest {
         URI uri = storageInterface.put(null, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Load put = Load.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .index(indice)
-            .from(uri.toString())
-            .chunk(10)
-            .idKey("id")
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .index(Property.of(indice))
+            .from(Property.of(uri.toString()))
+            .chunk(Property.of(10))
+            .idKey(Property.of("id"))
             .build();
 
         Load.Output runOutput = put.run(runContext);

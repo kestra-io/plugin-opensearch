@@ -3,6 +3,7 @@ package io.kestra.plugin.opensearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.opensearch.model.XContentType;
@@ -32,8 +33,7 @@ public abstract class AbstractSearch extends AbstractTask {
         title = "The OpenSearch indices.",
         description = "Default to all indices."
     )
-    @PluginProperty(dynamic = true)
-    private List<String> indexes;
+    private Property<List<String>> indexes;
 
     @Schema(
         title = "The OpenSearch value.",
@@ -45,9 +45,8 @@ public abstract class AbstractSearch extends AbstractTask {
     @Schema(
         title = "The content type of `value`."
     )
-    @PluginProperty
     @Builder.Default
-    private XContentType contentType = XContentType.JSON; //FIXME
+    private Property<XContentType> contentType = Property.of(XContentType.JSON); //FIXME
 
     protected SearchRequest.Builder request(RunContext runContext, OpenSearchTransport transport) throws IllegalVariableEvaluationException, IOException {
         SearchRequest.Builder request;
@@ -61,12 +60,13 @@ public abstract class AbstractSearch extends AbstractTask {
             throw new IllegalArgumentException("The `request` property must be a String or an Object");
         }
 
-        if (this.indexes != null) {
-            request.index(runContext.render(this.indexes));
+        var renderedIndex = runContext.render(this.indexes).asList(String.class);
+        if (!renderedIndex.isEmpty()) {
+            request.index(renderedIndex);
         }
 
         if (this.routing != null) {
-            request.routing(this.routing);
+            request.routing(runContext.render(this.routing).as(String.class).orElseThrow());
         }
 
         return request;

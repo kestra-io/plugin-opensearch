@@ -3,6 +3,7 @@ package io.kestra.plugin.opensearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +28,6 @@ import org.opensearch.client.RestClientBuilder;
 import java.net.URI;
 import java.util.List;
 import javax.net.ssl.SSLContext;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
@@ -42,10 +42,8 @@ public class OpensearchConnection {
         title = "List of HTTP OpenSearch servers.",
         description = "Must be an URI like `https://opensearch.com:9200` with scheme and port."
     )
-    @PluginProperty(dynamic = true)
     @NotNull
-    @NotEmpty
-    private List<String> hosts;
+    private Property<List<String>> hosts;
 
     @Schema(
         title = "Basic auth configuration."
@@ -57,8 +55,7 @@ public class OpensearchConnection {
         title = "List of HTTP headers to be send on every request.",
         description = "Must be a string with key value separated with `:`, ex: `Authorization: Token XYZ`."
     )
-    @PluginProperty(dynamic = true)
-    private List<String> headers;
+    private Property<List<String>> headers;
 
     @Schema(
         title = "Sets the path's prefix for every request used by the HTTP client.",
@@ -68,21 +65,18 @@ public class OpensearchConnection {
             "or a proxy that requires all paths to start with '/'; it is not intended for other purposes and " +
             "it should not be supplied in other scenarios."
     )
-    @PluginProperty(dynamic = true)
-    private String pathPrefix;
+    private Property<String> pathPrefix;
 
     @Schema(
         title = "Whether the REST client should return any response containing at least one warning header as a failure."
     )
-    @PluginProperty
-    private Boolean strictDeprecationMode;
+    private Property<Boolean> strictDeprecationMode;
 
     @Schema(
         title = "Trust all SSL CA certificates.",
         description = "Use this if the server is using a self signed SSL certificate."
     )
-    @PluginProperty
-    private Boolean trustAllSsl;
+    private Property<Boolean> trustAllSsl;
 
     @SuperBuilder
     @NoArgsConstructor
@@ -91,14 +85,12 @@ public class OpensearchConnection {
         @Schema(
             title = "Basic auth username."
         )
-        @PluginProperty(dynamic = true)
-        private String username;
+        private Property<String> username;
 
         @Schema(
             title = "Basic auth password."
         )
-        @PluginProperty(dynamic = true)
-        private String password;
+        private Property<String> password;
     }
 
     RestClientTransport client(RunContext runContext) throws IllegalVariableEvaluationException {
@@ -114,11 +106,11 @@ public class OpensearchConnection {
         }
 
         if (this.getPathPrefix() != null) {
-            builder.setPathPrefix(runContext.render(this.pathPrefix));
+            builder.setPathPrefix(runContext.render(this.pathPrefix).as(String.class).orElseThrow());
         }
 
         if (this.getStrictDeprecationMode() != null) {
-            builder.setStrictDeprecationMode(this.getStrictDeprecationMode());
+            builder.setStrictDeprecationMode(runContext.render(this.getStrictDeprecationMode()).as(Boolean.class).orElseThrow());
         }
 
         return new RestClientTransport(builder.build(), new JacksonJsonpMapper(MAPPER));
@@ -135,15 +127,15 @@ public class OpensearchConnection {
             basicCredential.setCredentials(
                 AuthScope.ANY,
                 new UsernamePasswordCredentials(
-                    runContext.render(this.basicAuth.username),
-                    runContext.render(this.basicAuth.password)
+                    runContext.render(this.basicAuth.username).as(String.class).orElseThrow(),
+                    runContext.render(this.basicAuth.password).as(String.class).orElse(null)
                 )
             );
 
             builder.setDefaultCredentialsProvider(basicCredential);
         }
 
-        if (trustAllSsl != null && trustAllSsl) {
+        if (Boolean.TRUE.equals(runContext.render(trustAllSsl).as(Boolean.class).orElse(false))) {
             SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
             sslContextBuilder.loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true);
             SSLContext sslContext = sslContextBuilder.build();
@@ -156,7 +148,7 @@ public class OpensearchConnection {
     }
 
     private HttpHost[] httpHosts(RunContext runContext) throws IllegalVariableEvaluationException {
-        return runContext.render(this.hosts)
+        return runContext.render(this.hosts).asList(String.class)
             .stream()
             .map(s -> {
                 URI uri = URI.create(s);
@@ -166,7 +158,7 @@ public class OpensearchConnection {
     }
 
     private Header[] defaultHeaders(RunContext runContext) throws IllegalVariableEvaluationException {
-        return runContext.render(this.headers)
+        return runContext.render(this.headers).asList(String.class)
             .stream()
             .map(header -> {
                 String[] nameAndValue = header.split(":");
