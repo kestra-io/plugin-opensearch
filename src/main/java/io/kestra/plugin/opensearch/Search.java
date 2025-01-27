@@ -5,6 +5,7 @@ import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.executions.metrics.Counter;
 import io.kestra.core.models.executions.metrics.Timer;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.common.FetchType;
 import io.kestra.core.runners.RunContext;
@@ -72,8 +73,7 @@ public class Search extends AbstractSearch implements RunnableTask<Search.Output
             + "NONE do nothing."
     )
     @Builder.Default
-    @PluginProperty
-    private FetchType fetchType = FetchType.FETCH;
+    private Property<FetchType> fetchType = Property.of(FetchType.FETCH);
 
     @Override
     public Output run(RunContext runContext) throws Exception {
@@ -89,7 +89,7 @@ public class Search extends AbstractSearch implements RunnableTask<Search.Output
 
             Output.OutputBuilder outputBuilder = Output.builder();
 
-            switch (fetchType) {
+            switch (runContext.render(fetchType).as(FetchType.class).orElseThrow()) {
                 case FETCH:
                     Pair<List<Map<String, Object>>, Integer> fetch = this.fetch(searchResponse);
                     outputBuilder

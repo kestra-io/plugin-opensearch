@@ -2,7 +2,7 @@ package io.kestra.plugin.opensearch;
 
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,24 +49,21 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
     @Schema(
         title = "The OpenSearch index."
     )
-    @PluginProperty(dynamic = true)
     @NotNull
-    private String index;
+    private Property<String> index;
 
     @Schema(
         title = "The OpenSearch id."
     )
-    @PluginProperty(dynamic = true)
     @NotNull
-    private String key;
+    private Property<String> key;
 
     @Schema(
         title = "Sets the version",
         description = "which will cause the get operation to only be performed if a matching version exists and no changes happened on the doc since then."
     )
-    @PluginProperty
     @NotNull
-    private Long version;
+    private Property<Long> version;
 
 
     @Override
@@ -74,22 +71,22 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
         Logger logger = runContext.logger();
         try (RestClientTransport transport = this.connection.client(runContext)) {
             OpenSearchClient client = new OpenSearchClient(transport);
-            String index = runContext.render(this.index);
-            String key = runContext.render(this.key);
+            String index = runContext.render(this.index).as(String.class).orElseThrow();
+            String key = runContext.render(this.key).as(String.class).orElseThrow();
 
             var request = new GetRequest.Builder();
             request.index(index).id(key);
 
             if (this.version != null) {
-                request.version(this.version);
+                request.version(runContext.render(this.version).as(Long.class).orElseThrow());
             }
 
             if (this.routing != null) {
-                request.routing(this.routing);
+                request.routing(runContext.render(this.routing).as(String.class).orElseThrow());
             }
 
             if (this.routing != null) {
-                request.routing(this.routing);
+                request.routing(runContext.render(this.routing).as(String.class).orElseThrow());
             }
 
             GetResponse<Map> response = client.get(request.build(), Map.class);

@@ -1,5 +1,6 @@
 package io.kestra.plugin.opensearch;
 
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.storages.StorageInterface;
@@ -36,8 +37,8 @@ class ScrollTest {
         RunContext runContext = runContextFactory.of();
 
         Scroll task = Scroll.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .indexes(Collections.singletonList("gbif"))
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .indexes(Property.of(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
@@ -58,8 +59,8 @@ class ScrollTest {
         RunContext runContext = runContextFactory.of();
 
         Scroll task = Scroll.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .indexes(Collections.singletonList("gbif"))
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .indexes(Property.of(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {

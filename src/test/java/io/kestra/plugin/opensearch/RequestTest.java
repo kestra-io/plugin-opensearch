@@ -1,5 +1,6 @@
 package io.kestra.plugin.opensearch;
 
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.utils.IdUtils;
@@ -32,10 +33,10 @@ class RequestTest {
         String indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
 
         Request request = Request.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .method(HttpMethod.POST)
-            .endpoint(indice + "/_doc/" + IdUtils.create())
-            .parameters(Map.of("human", "true"))
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .method(Property.of(HttpMethod.POST))
+            .endpoint(Property.of(indice + "/_doc/" + IdUtils.create()))
+            .parameters(Property.of(Map.of("human", "true")))
             .body(Map.of("name", "john"))
             .build();
 
@@ -50,9 +51,9 @@ class RequestTest {
         RunContext runContext = runContextFactory.of();
 
         Request request = Request.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .method(HttpMethod.GET)
-            .endpoint("_cat/indices")
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .method(Property.of(HttpMethod.GET))
+            .endpoint(Property.of("_cat/indices"))
             .build();
 
         Request.Output runOutput = request.run(runContext);

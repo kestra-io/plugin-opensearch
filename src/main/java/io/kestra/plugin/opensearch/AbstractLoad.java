@@ -4,6 +4,7 @@ import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.executions.metrics.Counter;
 import io.kestra.core.models.executions.metrics.Timer;
+import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.FileSerde;
@@ -37,23 +38,21 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
     @Schema(
         title = "The source file."
     )
-    @PluginProperty(dynamic = true)
     @NotNull
-    private String from;
+    private Property<String> from;
 
     @Schema(
         title = "The chunk size for every bulk request."
     )
-    @PluginProperty(dynamic = true)
     @Builder.Default
-    private Integer chunk = 1000;
+    private Property<Integer> chunk = Property.of(1000);
 
-    abstract protected Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException;
+    protected abstract Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException;
 
     @Override
     public Output run(RunContext runContext) throws Exception {
         Logger logger = runContext.logger();
-        URI from = new URI(runContext.render(this.from));
+        URI from = new URI(runContext.render(this.from).as(String.class).orElseThrow());
 
         try (
             RestClientTransport transport = this.connection.client(runContext);
@@ -63,11 +62,13 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
             AtomicLong count = new AtomicLong();
             AtomicLong duration = new AtomicLong();
 
+            var chunkRendered = runContext.render(this.chunk).as(Integer.class).orElseThrow();
+
             Flux<BulkResponse> flowable = this.source(runContext, inputStream)
                 .doOnNext(docWriteRequest -> {
                     count.incrementAndGet();
                 })
-                .buffer(this.chunk, this.chunk)
+                .buffer(chunkRendered, chunkRendered)
                 .map(throwFunction(indexRequests -> {
                     var bulkRequest = new BulkRequest.Builder();
                     bulkRequest.operations(indexRequests);

@@ -1,5 +1,6 @@
 package io.kestra.plugin.opensearch;
 
+import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.serializers.FileSerde;
@@ -67,9 +68,9 @@ class BulkTest {
         URI uri = storageInterface.put(null, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Bulk put = Bulk.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .from(uri.toString())
-            .chunk(10)
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .from(Property.of(uri.toString()))
+            .chunk(Property.of(10))
             .build();
 
         Bulk.Output runOutput = put.run(runContext);
@@ -95,9 +96,9 @@ class BulkTest {
         URI uri = storageInterface.put(null, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Bulk put = Bulk.builder()
-            .connection(OpensearchConnection.builder().hosts(hosts).build())
-            .from(uri.toString())
-            .chunk(10)
+            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
+            .from(Property.of(uri.toString()))
+            .chunk(Property.of(10))
             .build();
 
         Bulk.Output runOutput = put.run(runContext);
