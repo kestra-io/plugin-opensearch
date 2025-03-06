@@ -59,11 +59,11 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
     private Property<String> key;
 
     @Schema(
-        title = "Sets the version",
-        description = "which will cause the get operation to only be performed if a matching version exists and no changes happened on the doc since then."
+        title = "Current version of the document",
+        description = " The specified version must match the current version of the document for the GET request to succeed."
     )
     @NotNull
-    private Property<Long> version;
+    private Property<Long> docVersion;
 
 
     @Override
@@ -77,8 +77,8 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
             var request = new GetRequest.Builder();
             request.index(index).id(key);
 
-            if (this.version != null) {
-                request.version(runContext.render(this.version).as(Long.class).orElseThrow());
+            if (this.docVersion != null) {
+                request.version(runContext.render(this.docVersion).as(Long.class).orElseThrow());
             }
 
             if (this.routing != null) {
