@@ -39,6 +39,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
         title = "The source file."
     )
     @NotNull
+    @PluginProperty(internalStorageURI = true)
     private Property<String> from;
 
     @Schema(
