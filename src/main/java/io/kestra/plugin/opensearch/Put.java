@@ -32,7 +32,7 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Put an OpenSearch document."
+    title = "Insert a document into an OpenSearch cluster."
 )
 @Plugin(
     examples = {

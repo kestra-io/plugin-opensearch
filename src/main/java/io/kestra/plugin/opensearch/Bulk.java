@@ -35,7 +35,8 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Bulk load documents in OpenSearch using [bulk files](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)."
+    title = "Bulk load documents into OpenSearch using the bulk files API.",
+    description = "For more information, check out the [OpenSearch bulk files documentation](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)."
 )
 @Plugin(
     examples = {
