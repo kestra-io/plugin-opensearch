@@ -30,7 +30,7 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send a generic OpenSearch request."
+    title = "Send a request to an OpenSearch cluster."
 )
 @Plugin(
     examples = {
