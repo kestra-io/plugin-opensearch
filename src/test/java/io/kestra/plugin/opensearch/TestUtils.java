@@ -4,6 +4,7 @@ import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.storages.StorageInterface;
+import io.kestra.core.tenant.TenantService;
 import io.kestra.core.utils.IdUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
@@ -28,7 +29,7 @@ final class TestUtils {
         if (!gbif.value()) {
             // use a bulk task to init the index
             try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("gbif_data.json")) {
-                URI uri = storageInterface.put(null, null, URI.create("/" + IdUtils.create() + ".ion"), resourceAsStream);
+                URI uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), resourceAsStream);
 
                 Bulk put = Bulk.builder()
                     .connection(connection)
