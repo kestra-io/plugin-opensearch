@@ -33,10 +33,10 @@ class RequestTest {
         String indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
 
         Request request = Request.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .method(Property.of(HttpMethod.POST))
-            .endpoint(Property.of(indice + "/_doc/" + IdUtils.create()))
-            .parameters(Property.of(Map.of("human", "true")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .method(Property.ofValue(HttpMethod.POST))
+            .endpoint(Property.ofValue(indice + "/_doc/" + IdUtils.create()))
+            .parameters(Property.ofValue(Map.of("human", "true")))
             .body(Map.of("name", "john"))
             .build();
 
@@ -51,9 +51,9 @@ class RequestTest {
         RunContext runContext = runContextFactory.of();
 
         Request request = Request.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .method(Property.of(HttpMethod.GET))
-            .endpoint(Property.of("_cat/indices"))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .method(Property.ofValue(HttpMethod.GET))
+            .endpoint(Property.ofValue("_cat/indices"))
             .build();
 
         Request.Output runOutput = request.run(runContext);
