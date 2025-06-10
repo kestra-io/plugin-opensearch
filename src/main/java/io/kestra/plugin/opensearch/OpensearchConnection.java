@@ -11,17 +11,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 
@@ -123,14 +126,13 @@ public class OpensearchConnection {
         builder.setUserAgent("Kestra/" + runContext.version());
 
         if (basicAuth != null) {
-            final CredentialsProvider basicCredential = new BasicCredentialsProvider();
-            basicCredential.setCredentials(
-                AuthScope.ANY,
-                new UsernamePasswordCredentials(
+            final CredentialsProvider basicCredential = CredentialsProviderBuilder.create()
+                .add(
+                    new AuthScope(null, -1),
                     runContext.render(this.basicAuth.username).as(String.class).orElseThrow(),
-                    runContext.render(this.basicAuth.password).as(String.class).orElse(null)
+                    runContext.render(this.basicAuth.password).as(String.class).map(String::toCharArray).orElse(null)
                 )
-            );
+                .build();
 
             builder.setDefaultCredentialsProvider(basicCredential);
         }
@@ -140,8 +142,16 @@ public class OpensearchConnection {
             sslContextBuilder.loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true);
             SSLContext sslContext = sslContextBuilder.build();
 
-            builder.setSSLContext(sslContext);
-            builder.setSSLHostnameVerifier(new NoopHostnameVerifier());
+            TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
+                .setSslContext(sslContext)
+                .setHostnameVerifier(new NoopHostnameVerifier())
+                .buildAsync();
+
+            PoolingAsyncClientConnectionManager cm = PoolingAsyncClientConnectionManagerBuilder.create()
+                .setTlsStrategy(tlsStrategy)
+                .build();
+
+            builder.setConnectionManager(cm);
         }
 
         return builder;
@@ -152,7 +162,7 @@ public class OpensearchConnection {
             .stream()
             .map(s -> {
                 URI uri = URI.create(s);
-                return new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+                return new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
             })
             .toArray(HttpHost[]::new);
     }
