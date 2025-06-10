@@ -1,6 +1,5 @@
 package io.kestra.plugin.opensearch;
 
-import com.google.common.base.Charsets;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
@@ -14,12 +13,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.entity.ContentType;
+import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.core5.http.ContentType;
 import org.opensearch.client.Response;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.slf4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static io.kestra.core.utils.Rethrow.throwConsumer;
@@ -143,7 +143,7 @@ public class Request extends AbstractTask implements RunnableTask<Request.Output
             response.getWarnings().forEach(logger::warn);
 
             String contentType = response.getHeader("content-type");
-            String content = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
+            String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
 
             Output.OutputBuilder builder = Output.builder()
                 .status(response.getStatusLine().getStatusCode());
