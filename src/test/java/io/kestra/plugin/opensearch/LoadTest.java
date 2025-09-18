@@ -52,11 +52,11 @@ class LoadTest {
         URI uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Load put = Load.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .index(Property.of(indice))
-            .from(Property.of(uri.toString()))
-            .chunk(Property.of(10))
-            .idKey(Property.of("id"))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .index(Property.ofValue(indice))
+            .from(Property.ofValue(uri.toString()))
+            .chunk(Property.ofValue(10))
+            .idKey(Property.ofValue("id"))
             .build();
 
         Load.Output runOutput = put.run(runContext);

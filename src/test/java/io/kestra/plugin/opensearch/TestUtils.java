@@ -22,7 +22,7 @@ final class TestUtils {
 
     static void initData(RunContextFactory runContextFactory, StorageInterface storageInterface, List<String> hosts) throws Exception {
         RunContext runContext = runContextFactory.of();
-        OpensearchConnection connection = OpensearchConnection.builder().hosts(Property.of(hosts)).build();
+        OpensearchConnection connection = OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build();
 
         OpenSearchClient client = new OpenSearchClient(connection.client(runContext));
         BooleanResponse gbif = client.indices().exists(ExistsRequest.of(builder -> builder.index("gbig")));
@@ -33,8 +33,8 @@ final class TestUtils {
 
                 Bulk put = Bulk.builder()
                     .connection(connection)
-                    .from(Property.of(uri.toString()))
-                    .chunk(Property.of(10))
+                    .from(Property.ofValue(uri.toString()))
+                    .chunk(Property.ofValue(10))
                     .build();
 
                 Bulk.Output runOutput = put.run(runContext);

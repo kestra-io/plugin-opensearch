@@ -44,8 +44,8 @@ class SearchTest {
         RunContext runContext = runContextFactory.of();
 
         Search task = Search.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .indexes(Property.of(Collections.singletonList("gbif")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
@@ -67,8 +67,8 @@ class SearchTest {
         RunContext runContext = runContextFactory.of();
 
         Search task = Search.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .indexes(Property.of(Collections.singletonList("gbif")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
@@ -80,7 +80,7 @@ class SearchTest {
                         "key": "asc"
                     }
                 }""")
-            .fetchType(Property.of(FetchType.FETCH_ONE))
+            .fetchType(Property.ofValue(FetchType.FETCH_ONE))
             .build();
 
         Search.Output run = task.run(runContext);
@@ -96,8 +96,8 @@ class SearchTest {
         RunContext runContext = runContextFactory.of();
 
         Search task = Search.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .indexes(Property.of(Collections.singletonList("gbif")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
@@ -106,7 +106,7 @@ class SearchTest {
                         }
                     }
                 }""")
-            .fetchType(Property.of(FetchType.STORE))
+            .fetchType(Property.ofValue(FetchType.STORE))
             .build();
 
         Search.Output run = task.run(runContext);

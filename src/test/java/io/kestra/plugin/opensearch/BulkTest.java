@@ -69,9 +69,9 @@ class BulkTest {
         URI uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Bulk put = Bulk.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .from(Property.of(uri.toString()))
-            .chunk(Property.of(10))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .from(Property.ofValue(uri.toString()))
+            .chunk(Property.ofValue(10))
             .build();
 
         Bulk.Output runOutput = put.run(runContext);
@@ -97,9 +97,9 @@ class BulkTest {
         URI uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
 
         Bulk put = Bulk.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .from(Property.of(uri.toString()))
-            .chunk(Property.of(10))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .from(Property.ofValue(uri.toString()))
+            .chunk(Property.ofValue(10))
             .build();
 
         Bulk.Output runOutput = put.run(runContext);

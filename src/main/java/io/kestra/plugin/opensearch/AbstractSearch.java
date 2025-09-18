@@ -46,7 +46,7 @@ public abstract class AbstractSearch extends AbstractTask {
         title = "The content type of `value`."
     )
     @Builder.Default
-    private Property<XContentType> contentType = Property.of(XContentType.JSON); //FIXME
+    private Property<XContentType> contentType = Property.ofValue(XContentType.JSON); //FIXME
 
     protected SearchRequest.Builder request(RunContext runContext, OpenSearchTransport transport) throws IllegalVariableEvaluationException, IOException {
         SearchRequest.Builder request;

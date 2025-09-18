@@ -46,7 +46,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
         title = "The chunk size for every bulk request."
     )
     @Builder.Default
-    private Property<Integer> chunk = Property.of(1000);
+    private Property<Integer> chunk = Property.ofValue(1000);
 
     protected abstract Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException;
 

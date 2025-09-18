@@ -37,8 +37,8 @@ class ScrollTest {
         RunContext runContext = runContextFactory.of();
 
         Scroll task = Scroll.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .indexes(Property.of(Collections.singletonList("gbif")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
@@ -59,8 +59,8 @@ class ScrollTest {
         RunContext runContext = runContextFactory.of();
 
         Scroll task = Scroll.builder()
-            .connection(OpensearchConnection.builder().hosts(Property.of(hosts)).build())
-            .indexes(Property.of(Collections.singletonList("gbif")))
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
             .request("""
                 {
                     "query": {
