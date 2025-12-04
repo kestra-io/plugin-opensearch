@@ -1,8 +1,8 @@
 group: io.kestra.plugin.opensearch
 name: "opensearch"
 title: "OpenSearch"
-description: "This sub-group of plugins contains tasks for using Opensearch. Opensearch is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases."
-body: ""
+description: "Tasks that load, search, and manage data in OpenSearch clusters."
+body: "Configure OpenSearch hosts with optional basic auth or headers, then run load/bulk/index operations and search or scroll queries against specific indices; routing, refresh policies, HTTP methods, and path prefixes are exposed for fine-grained control."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"
