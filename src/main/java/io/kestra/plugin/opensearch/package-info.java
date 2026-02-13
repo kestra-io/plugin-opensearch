@@ -1,7 +1,9 @@
 @PluginSubGroup(
     description = "This sub-group of plugins contains tasks for using Opensearch.\n" +
-        "Opensearch is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases.",
-    categories = PluginSubGroup.PluginCategory.DATABASE
+        "Opensearch is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases.",categories = {
+        PluginSubGroup.PluginCategory.DATA,
+        PluginSubGroup.PluginCategory.INFRASTRUCTURE
+    }
 )
 package io.kestra.plugin.opensearch;
 
