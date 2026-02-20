@@ -28,7 +28,8 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Bulk load documents into OpenSearch using an Internal Storage file."
+    title = "Bulk load records from Internal Storage",
+    description = "Reads line-delimited JSON/ION from Kestra internal storage and indexes documents in batches."
 )
 @Plugin(
     examples = {
@@ -57,23 +58,26 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
 public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
 
     @Schema(
-        title = "The OpenSearch index."
+        title = "Target OpenSearch index"
     )
     @NotNull
     private Property<String> index;
 
     @Schema(
-        title = "Sets the type of operation to perform."
+        title = "Bulk operation type",
+        description = "Indexing op type; INDEX/CREATE supported, others rejected by client."
     )
     private Property<OpType> opType;
 
     @Schema(
-        title = "Use this key as id."
+        title = "Field to use as document id",
+        description = "If set, uses this field value as `_id`; field is removed when `removeIdKey` is true."
     )
     private Property<String> idKey;
 
     @Schema(
-        title = "Remove idKey from the final document."
+        title = "Remove idKey from document",
+        description = "Defaults to true; keep the id field in the document by setting to false."
     )
     @Builder.Default
     private Property<Boolean> removeIdKey = Property.ofValue(true);

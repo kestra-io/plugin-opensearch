@@ -32,7 +32,8 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Insert a document into an OpenSearch cluster."
+    title = "Index a single OpenSearch document",
+    description = "Writes one document with optional custom id, opType, routing, and refresh policy; accepts JSON string or Map payload."
 )
 @Plugin(
     examples = {
@@ -85,37 +86,39 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
     private static ObjectMapper MAPPER = JacksonMapper.ofJson();
 
     @Schema(
-        title = "The OpenSearch index."
+        title = "Target OpenSearch index"
     )
     @NotNull
     private Property<String> index;
 
     @Schema(
-        title = "Sets the type of operation to perform."
+        title = "Operation type",
+        description = "INDEX or CREATE are supported; others are rejected."
     )
     private Property<OpType> opType;
 
     @Schema(
-        title = "The OpenSearch id."
+        title = "Document id"
     )
     private Property<String> key;
 
     @Schema(
-        title = "The OpenSearch value.",
-        description = "Can be a string. In this case, the contentType will be used or a raw Map."
+        title = "Document body",
+        description = "String rendered then parsed using `contentType`, or a Map rendered and sent as JSON."
     )
     @PluginProperty(dynamic = true)
     private Object value;
 
     @Schema(
-        title = "Should this request trigger a refresh.",
-        description = "an immediate refresh `IMMEDIATE`, wait for a refresh `WAIT_UNTIL`, or proceed ignore refreshes entirely `NONE`."
+        title = "Refresh policy",
+        description = "IMMEDIATE forces refresh, WAIT_UNTIL waits for refresh, NONE (default) leaves refresh to cluster."
     )
     @Builder.Default
     private Property<RefreshPolicy> refreshPolicy = Property.ofValue(RefreshPolicy.NONE);
 
     @Schema(
-        title = "The content type of `value`."
+        title = "Payload content type",
+        description = "Format used when `value` is a string; defaults to JSON."
     )
     @Builder.Default
     private Property<XContentType> contentType = Property.ofValue(XContentType.JSON);
@@ -179,17 +182,17 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
         @Schema(
-            title = "The id of the document changed."
+            title = "Document id written"
         )
         private String id;
 
         @Schema(
-            title = "The change that occurred to the document."
+            title = "Result of the write"
         )
         private Result result;
 
         @Schema(
-            title = "The version of the updated document."
+            title = "Document version"
         )
         private Long version;
     }

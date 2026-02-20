@@ -36,14 +36,16 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
 @NoArgsConstructor
 public abstract class AbstractLoad extends AbstractTask implements RunnableTask<AbstractLoad.Output> {
     @Schema(
-        title = "The source file."
+        title = "Source file in Internal Storage",
+        description = "Path to Kestra internal storage object containing line-delimited JSON or ION records."
     )
     @NotNull
     @PluginProperty(internalStorageURI = true)
     private Property<String> from;
 
     @Schema(
-        title = "The chunk size for every bulk request."
+        title = "Bulk chunk size",
+        description = "Number of operations per bulk request; defaults to 1000."
     )
     @Builder.Default
     private Property<Integer> chunk = Property.ofValue(1000);
@@ -122,7 +124,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
         @Schema(
-            title = "The size of the rows fetched."
+            title = "Number of records sent"
         )
         private Long size;
     }
