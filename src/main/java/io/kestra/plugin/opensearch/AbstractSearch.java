@@ -30,20 +30,21 @@ public abstract class AbstractSearch extends AbstractTask {
     private static ObjectMapper MAPPER = JacksonMapper.ofJson();
 
     @Schema(
-        title = "The OpenSearch indices.",
-        description = "Default to all indices."
+        title = "Target indices",
+        description = "Optional list of indices; defaults to all when empty."
     )
     private Property<List<String>> indexes;
 
     @Schema(
-        title = "The OpenSearch value.",
-        description = "Can be a JSON string. In this case, the contentType will be used or a raw Map."
+        title = "Search request payload",
+        description = "JSON string or Map rendered then parsed into an OpenSearch SearchRequest."
     )
     @PluginProperty(dynamic = true)
     private Object request;
 
     @Schema(
-        title = "The content type of `value`."
+        title = "Payload content type",
+        description = "Format used to parse string requests; defaults to JSON."
     )
     @Builder.Default
     private Property<XContentType> contentType = Property.ofValue(XContentType.JSON); //FIXME

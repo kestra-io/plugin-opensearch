@@ -23,7 +23,8 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Get an OpenSearch document."
+    title = "Retrieve a document from OpenSearch",
+    description = "Fetches one document by index and id with optional routing and version match; returns the source map."
 )
 @Plugin(
     examples = {
@@ -41,26 +42,27 @@ import jakarta.validation.constraints.NotNull;
                         - "http://localhost:9200"
                     index: "my_index"
                     key: "my_id"
+                    docVersion: 1
                 """
         )
     }
 )
 public class Get extends AbstractTask implements RunnableTask<Get.Output> {
     @Schema(
-        title = "The OpenSearch index."
+        title = "Target OpenSearch index"
     )
     @NotNull
     private Property<String> index;
 
     @Schema(
-        title = "The OpenSearch id."
+        title = "Document id"
     )
     @NotNull
     private Property<String> key;
 
     @Schema(
-        title = "Current version of the document",
-        description = " The specified version must match the current version of the document for the GET request to succeed."
+        title = "Expected document version",
+        description = "Request fails if the cluster version differs; use for optimistic concurrency."
     )
     @NotNull
     private Property<Long> docVersion;

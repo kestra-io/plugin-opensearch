@@ -42,42 +42,39 @@ public class OpensearchConnection {
     private static final ObjectMapper MAPPER = JacksonMapper.ofJson(false);
 
     @Schema(
-        title = "List of HTTP OpenSearch servers.",
-        description = "Must be an URI like `https://opensearch.com:9200` with scheme and port."
+        title = "OpenSearch HTTP endpoints",
+        description = "One or more host URLs with scheme and port, e.g. `https://opensearch.com:9200`; all are used for load-balancing/failover."
     )
     @NotNull
     private Property<List<String>> hosts;
 
     @Schema(
-        title = "Basic auth configuration."
+        title = "Basic auth configuration"
     )
     @PluginProperty(dynamic = false)
     private BasicAuth basicAuth;
 
     @Schema(
-        title = "List of HTTP headers to be send on every request.",
-        description = "Must be a string with key value separated with `:`, ex: `Authorization: Token XYZ`."
+        title = "Additional HTTP headers",
+        description = "Each entry is `Key:Value`, e.g. `Authorization: Token XYZ`; rendered per request."
     )
     private Property<List<String>> headers;
 
     @Schema(
-        title = "Sets the path's prefix for every request used by the HTTP client.",
-        description = "For example, if this is set to `/my/path`, then any client request will become `/my/path/` + endpoint.\n" +
-            "In essence, every request's endpoint is prefixed by this `pathPrefix`.\n" +
-            "The path prefix is useful for when OpenSearch is behind a proxy that provides a base path " +
-            "or a proxy that requires all paths to start with '/'; it is not intended for other purposes and " +
-            "it should not be supplied in other scenarios."
+        title = "Path prefix for every request",
+        description = "Prepends `/my/path` to all endpoints when OpenSearch is behind a proxy enforcing a base path; leave unset otherwise."
     )
     private Property<String> pathPrefix;
 
     @Schema(
-        title = "Whether the REST client should return any response containing at least one warning header as a failure."
+        title = "Fail on warning headers",
+        description = "If true, any response containing an OpenSearch warning header is treated as a failure; defaults to server/client behavior."
     )
     private Property<Boolean> strictDeprecationMode;
 
     @Schema(
-        title = "Trust all SSL CA certificates.",
-        description = "Use this if the server is using a self signed SSL certificate."
+        title = "Trust all SSL certificates",
+        description = "Disables TLS verification for self-signed clusters; insecure, use only in trusted networks."
     )
     private Property<Boolean> trustAllSsl;
 
@@ -86,12 +83,12 @@ public class OpensearchConnection {
     @Getter
     public static class BasicAuth {
         @Schema(
-            title = "Basic auth username."
+            title = "Basic auth username"
         )
         private Property<String> username;
 
         @Schema(
-            title = "Basic auth password."
+            title = "Basic auth password"
         )
         private Property<String> password;
     }

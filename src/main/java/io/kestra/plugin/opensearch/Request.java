@@ -30,7 +30,8 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send a request to an OpenSearch cluster."
+    title = "Send raw OpenSearch HTTP request",
+    description = "Issue ad-hoc HTTP calls against the cluster with dynamic endpoint, parameters, and optional JSON body; defaults to GET."
 )
 @Plugin(
     examples = {
@@ -93,25 +94,27 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 )
 public class Request extends AbstractTask implements RunnableTask<Request.Output> {
     @Schema(
-        title = "The http method to use."
+        title = "HTTP method",
+        description = "Defaults to GET when not set."
     )
     @Builder.Default
     protected Property<HttpMethod> method = Property.ofValue(HttpMethod.GET);
 
     @Schema(
-        title = "The path of the request (without scheme, host, port, or prefix)."
+        title = "Request path",
+        description = "Endpoint without scheme/host/port; pathPrefix from the connection is prepended automatically."
     )
     @NotNull
     protected Property<String> endpoint;
 
     @Schema(
-        title = "Query string parameters."
+        title = "Query string parameters"
     )
     protected Property<Map<String, String>> parameters;
 
     @Schema(
-        title = "The full body.",
-        description = "Can be a JSON string or raw Map that will be converted to json."
+        title = "Request body",
+        description = "Accepts a JSON string or Map rendered then serialized as JSON."
     )
     @PluginProperty(dynamic = true)
     protected Object body;

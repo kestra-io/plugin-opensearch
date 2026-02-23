@@ -35,8 +35,8 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send an OpenSearch search request.",
-    description = "Get all documents from a search request and store it as outputs."
+    title = "Execute an OpenSearch search",
+    description = "Runs a search request and either returns rows, the first row, or stores results to Internal Storage; default fetchType is FETCH."
 )
 @Plugin(
     examples = {
@@ -65,11 +65,8 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 )
 public class Search extends AbstractSearch implements RunnableTask<Search.Output> {
     @Schema(
-        title = "The way you want to store the data.",
-        description = "FETCH_ONE output the first row, "
-            + "FETCH output all the rows, "
-            + "STORE store all rows in a file, "
-            + "NONE do nothing."
+        title = "Result handling strategy",
+        description = "FETCH returns all rows, FETCH_ONE returns the first row, STORE saves rows to Internal Storage, NONE skips output; defaults to FETCH."
     )
     @Builder.Default
     private Property<FetchType> fetchType = Property.ofValue(FetchType.FETCH);
@@ -160,30 +157,30 @@ public class Search extends AbstractSearch implements RunnableTask<Search.Output
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
         @Schema(
-            title = "The size of the rows fetched."
+            title = "Number of rows fetched"
         )
         private Integer size;
 
         @Schema(
-            title = "The total of the rows fetched without pagination."
+            title = "Total hits without pagination"
         )
         private Long total;
 
         @Schema(
-            title = "List containing the fetched data.",
-            description = "Only populated if using `fetchType=FETCH`."
+            title = "All fetched rows",
+            description = "Populated when fetchType is FETCH."
         )
         private List<Map<String, Object>> rows;
 
         @Schema(
-            title = "Map containing the first row of fetched data.",
-            description = "Only populated if using `fetchType=FETCH_ONE`."
+            title = "First row fetched",
+            description = "Populated when fetchType is FETCH_ONE."
         )
         private Map<String, Object> row;
 
         @Schema(
-            title = "The URI of the stored data.",
-            description = "Only populated if using `fetchType=STORE`."
+            title = "URI of stored data",
+            description = "Populated when fetchType is STORE."
         )
         private URI uri;
     }

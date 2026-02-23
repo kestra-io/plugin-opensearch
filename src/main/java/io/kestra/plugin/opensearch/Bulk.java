@@ -35,20 +35,21 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Bulk load documents into OpenSearch using the bulk files API.",
-    description = "For more information, check out the [OpenSearch bulk files documentation](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)."
+    title = "Replay bulk request file to OpenSearch",
+    description = "Streams a preformatted bulk file (action + source lines) to the [OpenSearch Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/); honors connection headers, routing, and chunking."
 )
-@Plugin(
-    examples = {
-        @Example(
-            full = true,
-            code = """
-                id: opensearch_bulk_load
-                namespace: company.team
+    @Plugin(
+        examples = {
+            @Example(
+                full = true,
+                title = "Send a preformatted Bulk API file (action + source lines).",
+                code = """
+                    id: opensearch_bulk_load
+                    namespace: company.team
 
-                inputs:
-                  - id: file
-                    type: FILE
+                    inputs:
+                      - id: file
+                        type: FILE
 
                 tasks:
                   - id: bulk_load
@@ -57,10 +58,11 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
                       hosts:
                         - "http://localhost:9200"
                     from: "{{ inputs.file }}"
+                    # `inputs.file` must contain alternating action and source lines as expected by the Bulk API.
                 """
-        )
-    }
-)
+            )
+        }
+    )
 public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
     private static final ObjectMapper OBJECT_MAPPER = JacksonMapper.ofJson();
 

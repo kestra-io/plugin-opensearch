@@ -15,14 +15,15 @@ import jakarta.validation.constraints.NotNull;
 @NoArgsConstructor
 public abstract class AbstractTask extends Task {
     @Schema(
-        title = "The connection properties."
+        title = "Configure OpenSearch connection",
+        description = "Hosts, auth headers, and TLS options reused by every task invocation."
     )
     @NotNull
     protected OpensearchConnection connection;
 
     @Schema(
-        title = "Controls the shard routing of the request.",
-        description = "Using this value to hash the shard and not the id."
+        title = "Shard routing key",
+        description = "Hashes routing using this value instead of the document id to colocate related records."
     )
     protected Property<String> routing;
 }
