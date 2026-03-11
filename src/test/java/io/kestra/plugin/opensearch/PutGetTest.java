@@ -1,18 +1,21 @@
 package io.kestra.plugin.opensearch;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
 import com.google.common.collect.ImmutableMap;
+
+import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.utils.IdUtils;
-import io.micronaut.context.annotation.Value;
-import io.kestra.core.junit.annotations.KestraTest;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import io.micronaut.context.annotation.Value;
+import jakarta.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,9 +54,11 @@ class PutGetTest {
         put = Put.builder()
             .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
             .index(Property.ofValue(indice))
-            .value(Map.of(
-                "name", "Jane Doe"
-            ))
+            .value(
+                Map.of(
+                    "name", "Jane Doe"
+                )
+            )
             .build();
 
         putOutput = put.run(runContext);

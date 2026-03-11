@@ -1,31 +1,34 @@
 package io.kestra.plugin.opensearch;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.bulk.CreateOperation;
+import org.opensearch.client.opensearch.core.bulk.DeleteOperation;
+import org.opensearch.client.opensearch.core.bulk.IndexOperation;
+import org.opensearch.client.opensearch.core.bulk.UpdateOperation;
+
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.opensearch.client.opensearch.core.bulk.BulkOperation;
-import org.opensearch.client.opensearch.core.bulk.CreateOperation;
-import org.opensearch.client.opensearch.core.bulk.DeleteOperation;
-import org.opensearch.client.opensearch.core.bulk.IndexOperation;
-import org.opensearch.client.opensearch.core.bulk.UpdateOperation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static io.kestra.core.utils.Rethrow.throwConsumer;
 
@@ -38,12 +41,12 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
     title = "Replay bulk request file to OpenSearch",
     description = "Streams a preformatted bulk file (action + source lines) to the [OpenSearch Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/); honors connection headers, routing, and chunking."
 )
-    @Plugin(
-        examples = {
-            @Example(
-                full = true,
-                title = "Send a preformatted Bulk API file (action + source lines).",
-                code = """
+@Plugin(
+    examples = {
+        @Example(
+            full = true,
+            title = "Send a preformatted Bulk API file (action + source lines).",
+            code = """
                     id: opensearch_bulk_load
                     namespace: company.team
 
@@ -60,9 +63,9 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
                     from: "{{ inputs.file }}"
                     # `inputs.file` must contain alternating action and source lines as expected by the Bulk API.
                 """
-            )
-        }
-    )
+        )
+    }
+)
 public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
     private static final ObjectMapper OBJECT_MAPPER = JacksonMapper.ofJson();
 
@@ -74,7 +77,8 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
 
     @SuppressWarnings("unchecked")
     public Consumer<FluxSink<BulkOperation>> fileReader(BufferedReader input) throws IOException {
-        return throwConsumer(s -> {
+        return throwConsumer(s ->
+        {
             String row;
             Boolean isJson = null;
 
@@ -142,7 +146,7 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
         });
     }
 
-    private static Map<?,?> parseline(Boolean isJson, String line) throws JsonProcessingException {
+    private static Map<?, ?> parseline(Boolean isJson, String line) throws JsonProcessingException {
         if (isJson) {
             return OBJECT_MAPPER.readValue(line, JacksonMapper.MAP_TYPE_REFERENCE);
         } else {

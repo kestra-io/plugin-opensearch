@@ -1,7 +1,17 @@
 package io.kestra.plugin.opensearch;
 
+import java.util.Map;
+
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
@@ -13,18 +23,11 @@ import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.opensearch.model.OpType;
 import io.kestra.plugin.opensearch.model.RefreshPolicy;
 import io.kestra.plugin.opensearch.model.XContentType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.Result;
-import org.opensearch.client.opensearch.core.IndexRequest;
-import org.opensearch.client.opensearch.core.IndexResponse;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.slf4j.Logger;
-
-import java.util.Map;
-import jakarta.validation.constraints.NotNull;
 
 @SuperBuilder
 @ToString
@@ -133,7 +136,6 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
 
             var request = new IndexRequest.Builder<Map>();
             request.index(index);
-
 
             this.source(runContext, request);
 

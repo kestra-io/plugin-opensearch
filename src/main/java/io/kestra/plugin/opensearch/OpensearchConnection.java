@@ -1,16 +1,10 @@
 package io.kestra.plugin.opensearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kestra.core.exceptions.IllegalVariableEvaluationException;
-import io.kestra.core.models.annotations.PluginProperty;
-import io.kestra.core.models.property.Property;
-import io.kestra.core.runners.RunContext;
-import io.kestra.core.serializers.JacksonMapper;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.experimental.SuperBuilder;
+import java.net.URI;
+import java.util.List;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
@@ -27,13 +21,23 @@ import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.ssl.TrustStrategy;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
-
-import java.net.URI;
-import java.util.List;
-import javax.net.ssl.SSLContext;
-import jakarta.validation.constraints.NotNull;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.kestra.core.exceptions.IllegalVariableEvaluationException;
+import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.property.Property;
+import io.kestra.core.runners.RunContext;
+import io.kestra.core.serializers.JacksonMapper;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -96,7 +100,8 @@ public class OpensearchConnection {
     RestClientTransport client(RunContext runContext) throws IllegalVariableEvaluationException {
         RestClientBuilder builder = RestClient
             .builder(this.httpHosts(runContext))
-            .setHttpClientConfigCallback(httpClientBuilder -> {
+            .setHttpClientConfigCallback(httpClientBuilder ->
+            {
                 httpClientBuilder = this.httpAsyncClientBuilder(runContext);
                 return httpClientBuilder;
             });
@@ -157,7 +162,8 @@ public class OpensearchConnection {
     private HttpHost[] httpHosts(RunContext runContext) throws IllegalVariableEvaluationException {
         return runContext.render(this.hosts).asList(String.class)
             .stream()
-            .map(s -> {
+            .map(s ->
+            {
                 URI uri = URI.create(s);
                 return new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
             })
@@ -167,7 +173,8 @@ public class OpensearchConnection {
     private Header[] defaultHeaders(RunContext runContext) throws IllegalVariableEvaluationException {
         return runContext.render(this.headers).asList(String.class)
             .stream()
-            .map(header -> {
+            .map(header ->
+            {
                 String[] nameAndValue = header.split(":");
                 return new BasicHeader(nameAndValue[0], nameAndValue[1]);
             })

@@ -1,5 +1,19 @@
 package io.kestra.plugin.opensearch;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.BulkRequest;
+import org.opensearch.client.opensearch.core.BulkResponse;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.slf4j.Logger;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.executions.metrics.Counter;
@@ -8,23 +22,11 @@ import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.FileSerde;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch.core.BulkRequest;
-import org.opensearch.client.opensearch.core.BulkResponse;
-import org.opensearch.client.opensearch.core.bulk.BulkOperation;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.slf4j.Logger;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicLong;
-import jakarta.validation.constraints.NotNull;
 import reactor.core.publisher.Flux;
 
 import static io.kestra.core.utils.Rethrow.throwFunction;
@@ -68,17 +70,20 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
             var chunkRendered = runContext.render(this.chunk).as(Integer.class).orElseThrow();
 
             Flux<BulkResponse> flowable = this.source(runContext, inputStream)
-                .doOnNext(docWriteRequest -> {
+                .doOnNext(docWriteRequest ->
+                {
                     count.incrementAndGet();
                 })
                 .buffer(chunkRendered, chunkRendered)
-                .map(throwFunction(indexRequests -> {
+                .map(throwFunction(indexRequests ->
+                {
                     var bulkRequest = new BulkRequest.Builder();
                     bulkRequest.operations(indexRequests);
 
                     return client.bulk(bulkRequest.build());
                 }))
-                .doOnNext(bulkItemResponse -> {
+                .doOnNext(bulkItemResponse ->
+                {
                     duration.addAndGet(bulkItemResponse.took());
 
                     if (bulkItemResponse.errors()) {
@@ -108,7 +113,8 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
     private String logError(BulkResponse bulkResponse) {
         StringBuilder builder = new StringBuilder();
         bulkResponse.items().forEach(
-            responseItem -> {
+            responseItem ->
+            {
                 if (responseItem.error() != null) {
                     builder
                         .append(responseItem.index()).append(": ")

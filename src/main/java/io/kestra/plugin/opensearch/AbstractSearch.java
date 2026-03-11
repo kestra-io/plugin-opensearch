@@ -1,25 +1,28 @@
 package io.kestra.plugin.opensearch;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
+
+import org.opensearch.client.json.JsonpMapper;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.transport.OpenSearchTransport;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.opensearch.model.XContentType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.json.stream.JsonParser;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.opensearch.client.json.JsonpMapper;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.transport.OpenSearchTransport;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Map;
 
 @SuperBuilder
 @ToString

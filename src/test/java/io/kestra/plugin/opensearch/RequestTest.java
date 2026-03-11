@@ -1,18 +1,20 @@
 package io.kestra.plugin.opensearch;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.utils.IdUtils;
 import io.kestra.plugin.opensearch.model.HttpMethod;
-import io.micronaut.context.annotation.Value;
-import io.kestra.core.junit.annotations.KestraTest;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import io.micronaut.context.annotation.Value;
+import jakarta.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,7 +26,6 @@ class RequestTest {
 
     @Value("${openSearch-hosts}")
     private List<String> hosts;
-
 
     @SuppressWarnings("unchecked")
     @Test
@@ -39,7 +40,6 @@ class RequestTest {
             .parameters(Property.ofValue(Map.of("human", "true")))
             .body(Map.of("name", "john"))
             .build();
-
 
         Request.Output runOutput = request.run(runContext);
 

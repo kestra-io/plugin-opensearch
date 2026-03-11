@@ -1,5 +1,15 @@
 package io.kestra.plugin.opensearch;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.opensearch.client.Response;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.slf4j.Logger;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
@@ -8,21 +18,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.opensearch.model.HttpMethod;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.entity.EntityBuilder;
-import org.apache.hc.core5.http.ContentType;
-import org.opensearch.client.Response;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.slf4j.Logger;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
-import static io.kestra.core.utils.Rethrow.throwConsumer;
 
 @SuperBuilder
 @ToString
@@ -131,11 +131,12 @@ public class Request extends AbstractTask implements RunnableTask<Request.Output
             runContext.render(this.parameters).asMap(String.class, String.class).forEach(request::addParameter);
 
             if (this.body != null) {
-                request.setEntity(EntityBuilder
-                    .create()
-                    .setContentType(ContentType.APPLICATION_JSON)
-                    .setText(OpensearchService.toBody(runContext, this.body))
-                    .build()
+                request.setEntity(
+                    EntityBuilder
+                        .create()
+                        .setContentType(ContentType.APPLICATION_JSON)
+                        .setText(OpensearchService.toBody(runContext, this.body))
+                        .build()
                 );
             }
 
