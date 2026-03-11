@@ -16,3 +16,4 @@ out/
 src/test/resources/application-test.yml
 .github/workflows/*_data.json.factorypath
 bin/
+.factorypath
