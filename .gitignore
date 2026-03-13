@@ -14,6 +14,6 @@ out/
 .classpath
 .attach*
 src/test/resources/application-test.yml
-.github/workflows/*_data.json.factorypath
+.github/workflows/*_data.json
 bin/
 .factorypath
