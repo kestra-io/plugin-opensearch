@@ -23,6 +23,7 @@ import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 
 import static io.kestra.core.utils.Rethrow.throwFunction;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -63,18 +64,21 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
         title = "Target OpenSearch index"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> index;
 
     @Schema(
         title = "Bulk operation type",
         description = "Indexing op type; INDEX/CREATE supported, others rejected by client."
     )
+    @PluginProperty(group = "advanced")
     private Property<OpType> opType;
 
     @Schema(
         title = "Field to use as document id",
         description = "If set, uses this field value as `_id`; field is removed when `removeIdKey` is true."
     )
+    @PluginProperty(group = "connection")
     private Property<String> idKey;
 
     @Schema(
@@ -82,6 +86,7 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
         description = "Defaults to true; keep the id field in the document by setting to false."
     )
     @Builder.Default
+    @PluginProperty(group = "connection")
     private Property<Boolean> removeIdKey = Property.ofValue(true);
 
     @SuppressWarnings("unchecked")

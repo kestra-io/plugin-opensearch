@@ -50,36 +50,41 @@ public class OpensearchConnection {
         description = "One or more host URLs with scheme and port, e.g. `https://opensearch.com:9200`; all are used for load-balancing/failover."
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<List<String>> hosts;
 
     @Schema(
         title = "Basic auth configuration"
     )
-    @PluginProperty(dynamic = false)
+    @PluginProperty(dynamic = false, group = "advanced")
     private BasicAuth basicAuth;
 
     @Schema(
         title = "Additional HTTP headers",
         description = "Each entry is `Key:Value`, e.g. `Authorization: Token XYZ`; rendered per request."
     )
+    @PluginProperty(group = "advanced")
     private Property<List<String>> headers;
 
     @Schema(
         title = "Path prefix for every request",
         description = "Prepends `/my/path` to all endpoints when OpenSearch is behind a proxy enforcing a base path; leave unset otherwise."
     )
+    @PluginProperty(group = "advanced")
     private Property<String> pathPrefix;
 
     @Schema(
         title = "Fail on warning headers",
         description = "If true, any response containing an OpenSearch warning header is treated as a failure; defaults to server/client behavior."
     )
+    @PluginProperty(group = "advanced")
     private Property<Boolean> strictDeprecationMode;
 
     @Schema(
         title = "Trust all SSL certificates",
         description = "Disables TLS verification for self-signed clusters; insecure, use only in trusted networks."
     )
+    @PluginProperty(group = "advanced")
     private Property<Boolean> trustAllSsl;
 
     @SuperBuilder
@@ -89,11 +94,13 @@ public class OpensearchConnection {
         @Schema(
             title = "Basic auth username"
         )
+        @PluginProperty(group = "connection")
         private Property<String> username;
 
         @Schema(
             title = "Basic auth password"
         )
+        @PluginProperty(group = "connection")
         private Property<String> password;
     }
 

@@ -42,7 +42,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
         description = "Path to Kestra internal storage object containing line-delimited JSON or ION records."
     )
     @NotNull
-    @PluginProperty(internalStorageURI = true)
+    @PluginProperty(internalStorageURI = true, group = "main")
     private Property<String> from;
 
     @Schema(
@@ -50,6 +50,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
         description = "Number of operations per bulk request; defaults to 1000."
     )
     @Builder.Default
+    @PluginProperty(group = "execution")
     private Property<Integer> chunk = Property.ofValue(1000);
 
     protected abstract Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException;

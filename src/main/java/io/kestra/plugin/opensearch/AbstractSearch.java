@@ -36,13 +36,14 @@ public abstract class AbstractSearch extends AbstractTask {
         title = "Target indices",
         description = "Optional list of indices; defaults to all when empty."
     )
+    @PluginProperty(group = "advanced")
     private Property<List<String>> indexes;
 
     @Schema(
         title = "Search request payload",
         description = "JSON string or Map rendered then parsed into an OpenSearch SearchRequest."
     )
-    @PluginProperty(dynamic = true)
+    @PluginProperty(dynamic = true, group = "advanced")
     private Object request;
 
     @Schema(
@@ -50,6 +51,7 @@ public abstract class AbstractSearch extends AbstractTask {
         description = "Format used to parse string requests; defaults to JSON."
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     private Property<XContentType> contentType = Property.ofValue(XContentType.JSON); //FIXME
 
     protected SearchRequest.Builder request(RunContext runContext, OpenSearchTransport transport) throws IllegalVariableEvaluationException, IOException {
