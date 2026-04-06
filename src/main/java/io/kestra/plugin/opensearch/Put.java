@@ -92,24 +92,27 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
         title = "Target OpenSearch index"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> index;
 
     @Schema(
         title = "Operation type",
         description = "INDEX or CREATE are supported; others are rejected."
     )
+    @PluginProperty(group = "advanced")
     private Property<OpType> opType;
 
     @Schema(
         title = "Document id"
     )
+    @PluginProperty(group = "connection")
     private Property<String> key;
 
     @Schema(
         title = "Document body",
         description = "String rendered then parsed using `contentType`, or a Map rendered and sent as JSON."
     )
-    @PluginProperty(dynamic = true)
+    @PluginProperty(dynamic = true, group = "advanced")
     private Object value;
 
     @Schema(
@@ -117,6 +120,7 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
         description = "IMMEDIATE forces refresh, WAIT_UNTIL waits for refresh, NONE (default) leaves refresh to cluster."
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     private Property<RefreshPolicy> refreshPolicy = Property.ofValue(RefreshPolicy.NONE);
 
     @Schema(
@@ -124,6 +128,7 @@ public class Put extends AbstractTask implements RunnableTask<Put.Output> {
         description = "Format used when `value` is a string; defaults to JSON."
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     private Property<XContentType> contentType = Property.ofValue(XContentType.JSON);
 
     @Override

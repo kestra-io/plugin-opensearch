@@ -98,6 +98,7 @@ public class Request extends AbstractTask implements RunnableTask<Request.Output
         description = "Defaults to GET when not set."
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<HttpMethod> method = Property.ofValue(HttpMethod.GET);
 
     @Schema(
@@ -105,18 +106,20 @@ public class Request extends AbstractTask implements RunnableTask<Request.Output
         description = "Endpoint without scheme/host/port; pathPrefix from the connection is prepended automatically."
     )
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> endpoint;
 
     @Schema(
         title = "Query string parameters"
     )
+    @PluginProperty(group = "main")
     protected Property<Map<String, String>> parameters;
 
     @Schema(
         title = "Request body",
         description = "Accepts a JSON string or Map rendered then serialized as JSON."
     )
-    @PluginProperty(dynamic = true)
+    @PluginProperty(dynamic = true, group = "main")
     protected Object body;
 
     @Override

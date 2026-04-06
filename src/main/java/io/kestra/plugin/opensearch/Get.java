@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -54,12 +55,14 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
         title = "Target OpenSearch index"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> index;
 
     @Schema(
         title = "Document id"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> key;
 
     @Schema(
@@ -67,6 +70,7 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
         description = "Request fails if the cluster version differs; use for optimistic concurrency."
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<Long> docVersion;
 
     @Override

@@ -30,6 +30,7 @@ import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 
 import static io.kestra.core.utils.Rethrow.throwConsumer;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -71,6 +72,7 @@ public class Search extends AbstractSearch implements RunnableTask<Search.Output
         description = "FETCH returns all rows, FETCH_ONE returns the first row, STORE saves rows to Internal Storage, NONE skips output; defaults to FETCH."
     )
     @Builder.Default
+    @PluginProperty(group = "processing")
     private Property<FetchType> fetchType = Property.ofValue(FetchType.FETCH);
 
     @Override

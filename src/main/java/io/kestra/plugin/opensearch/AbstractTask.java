@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -19,11 +20,13 @@ public abstract class AbstractTask extends Task {
         description = "Hosts, auth headers, and TLS options reused by every task invocation."
     )
     @NotNull
+    @PluginProperty(group = "main")
     protected OpensearchConnection connection;
 
     @Schema(
         title = "Shard routing key",
         description = "Hashes routing using this value instead of the document id to colocate related records."
     )
+    @PluginProperty(group = "advanced")
     protected Property<String> routing;
 }
