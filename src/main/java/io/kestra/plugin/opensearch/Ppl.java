@@ -79,7 +79,7 @@ import reactor.core.publisher.Flux;
 public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
     @Schema(
         title = "PPL query string",
-        description = "PPL statement rendered at runtime. Required."
+        description = "PPL statement rendered at runtime."
     )
     @NotNull
     @PluginProperty(group = "main")
@@ -102,7 +102,7 @@ public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
 
     @Schema(
         title = "Result handling mode",
-        description = "Controls how query results are exposed. Default `FETCH` returns all rows. `FETCH_ONE` returns the first row only when format is `JDBC`. `STORE` writes data to Kestra storage and returns a URI. `NONE` leaves outputs empty. `CSV` and `RAW` return the full text payload regardless of fetchType."
+        description = "Controls how query results are exposed. `FETCH` returns all rows. `FETCH_ONE` returns the first row (JDBC format only). `STORE` writes results to Kestra internal storage and returns a URI. `NONE` produces no output. For `CSV` and `RAW` formats, `FETCH` and `FETCH_ONE` return the full text payload in the `text` output; `STORE` saves it as a file."
     )
     @Builder.Default
     @PluginProperty(group = "processing")
@@ -247,7 +247,7 @@ public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
 
         @Schema(
             title = "Raw text payload",
-            description = "Set when format is `CSV` or `RAW`. Full response body as text."
+            description = "Set when format is `CSV` or `RAW` and fetchType is `FETCH` or `FETCH_ONE`. Full response body as text."
         )
         private String text;
     }
