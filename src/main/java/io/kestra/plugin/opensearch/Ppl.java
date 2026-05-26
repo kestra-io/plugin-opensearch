@@ -1,8 +1,8 @@
 package io.kestra.plugin.opensearch;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -162,7 +162,8 @@ public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
 
         List<String> columns = schema.stream().map(s -> (String) s.get("name")).toList();
         List<Map<String, Object>> rows = datarows.stream()
-            .map(values -> {
+            .map(values ->
+            {
                 Map<String, Object> row = new LinkedHashMap<>();
                 for (int i = 0; i < columns.size() && i < values.size(); i++) {
                     row.put(columns.get(i), values.get(i));
@@ -178,8 +179,8 @@ public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
             case FETCH_ONE -> builder.row(rows.isEmpty() ? null : rows.getFirst()).size(rows.isEmpty() ? 0 : 1);
             case STORE -> {
                 File tempFile = runContext.workingDir().createTempFile(".ion").toFile();
-                try (var writer = new BufferedWriter(new FileWriter(tempFile), FileSerde.BUFFER_SIZE)) {
-                    Long count = FileSerde.writeAll(writer, Flux.fromIterable(rows)).block();
+                try (var output = new BufferedOutputStream(new FileOutputStream(tempFile), FileSerde.BUFFER_SIZE)) {
+                    Long count = FileSerde.writeAll(output, Flux.fromIterable(rows)).block();
                     builder.uri(runContext.storage().putFile(tempFile)).size(count == null ? 0 : count.intValue());
                 }
             }
@@ -200,7 +201,8 @@ public class Ppl extends AbstractTask implements RunnableTask<Ppl.Output> {
                 Files.writeString(tempFile.toPath(), content, StandardCharsets.UTF_8);
                 builder.uri(runContext.storage().putFile(tempFile));
             }
-            case NONE -> { }
+            case NONE -> {
+            }
         }
 
         return builder.build();
