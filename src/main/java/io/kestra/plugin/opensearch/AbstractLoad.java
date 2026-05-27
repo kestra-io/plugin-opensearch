@@ -1,8 +1,8 @@
 package io.kestra.plugin.opensearch;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
@@ -53,7 +53,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
     @PluginProperty(group = "execution")
     private Property<Integer> chunk = Property.ofValue(1000);
 
-    protected abstract Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException;
+    protected abstract Flux<BulkOperation> source(RunContext runContext, InputStream inputStream) throws IllegalVariableEvaluationException, IOException;
 
     @Override
     public Output run(RunContext runContext) throws Exception {
@@ -62,7 +62,7 @@ public abstract class AbstractLoad extends AbstractTask implements RunnableTask<
 
         try (
             RestClientTransport transport = this.connection.client(runContext);
-            BufferedReader inputStream = new BufferedReader(new InputStreamReader(runContext.storage().getFile(from)), FileSerde.BUFFER_SIZE)
+            InputStream inputStream = new BufferedInputStream(runContext.storage().getFile(from), FileSerde.BUFFER_SIZE)
         ) {
             OpenSearchClient client = new OpenSearchClient(transport);
             AtomicLong count = new AtomicLong();

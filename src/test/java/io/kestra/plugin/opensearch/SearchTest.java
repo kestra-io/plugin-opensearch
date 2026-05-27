@@ -117,9 +117,9 @@ class SearchTest {
         assertThat(run.getTotal(), is(28L));
         assertThat(run.getUri(), notNullValue());
 
-        BufferedReader inputStream = new BufferedReader(new InputStreamReader(storageInterface.get(TenantService.MAIN_TENANT, null, run.getUri())));
+        InputStream inputStream = new BufferedInputStream(storageInterface.get(TenantService.MAIN_TENANT, null, run.getUri()));
         List<Map<String, Object>> result = new ArrayList<>();
-        FileSerde.reader(inputStream, r -> result.add((Map<String, Object>) r));
+        FileSerde.read(inputStream, r -> result.add((Map<String, Object>) r));
 
         assertThat(result.get(8).get("key"), is(925311404));
     }
