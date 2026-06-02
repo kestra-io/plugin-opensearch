@@ -94,13 +94,13 @@ public class OpensearchConnection {
         @Schema(
             title = "Basic auth username"
         )
-        @PluginProperty(group = "connection")
+        @PluginProperty(secret = true, group = "connection")
         private Property<String> username;
 
         @Schema(
             title = "Basic auth password"
         )
-        @PluginProperty(group = "connection")
+        @PluginProperty(secret = true, group = "connection")
         private Property<String> password;
     }
 

@@ -1,0 +1,12 @@
+id: opensearch_ppl
+namespace: company.team
+
+tasks:
+  - id: ppl_query
+    type: io.kestra.plugin.opensearch.Ppl
+    connection:
+      hosts:
+        - "http://localhost:9200"
+    query: "source=accounts | where age > 30 | stats count() by gender"
+    fetchSize: 100
+    format: JDBC

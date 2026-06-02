@@ -1,7 +1,7 @@
 package io.kestra.plugin.opensearch;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
@@ -10,6 +10,7 @@ import org.opensearch.client.opensearch.core.bulk.IndexOperation;
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
@@ -23,7 +24,6 @@ import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 
 import static io.kestra.core.utils.Rethrow.throwFunction;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -91,7 +91,7 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IllegalVariableEvaluationException, IOException {
+    protected Flux<BulkOperation> source(RunContext runContext, InputStream inputStream) throws IllegalVariableEvaluationException, IOException {
         return FileSerde.readAll(inputStream)
             .map(throwFunction(o ->
             {

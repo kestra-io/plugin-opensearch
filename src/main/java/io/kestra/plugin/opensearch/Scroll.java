@@ -71,7 +71,7 @@ public class Scroll extends AbstractSearch implements RunnableTask<Scroll.Output
 
         try (
             RestClientTransport transport = this.connection.client(runContext);
-            Writer output = new BufferedWriter(new FileWriter(tempFile), FileSerde.BUFFER_SIZE)
+            OutputStream output = new BufferedOutputStream(new FileOutputStream(tempFile), FileSerde.BUFFER_SIZE)
         ) {
             OpenSearchClient client = new OpenSearchClient(transport);
             // build request

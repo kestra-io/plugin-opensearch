@@ -2,6 +2,8 @@ package io.kestra.plugin.opensearch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -70,9 +72,9 @@ public class Bulk extends AbstractLoad implements RunnableTask<Bulk.Output> {
     private static final ObjectMapper OBJECT_MAPPER = JacksonMapper.ofJson();
 
     @Override
-    protected Flux<BulkOperation> source(RunContext runContext, BufferedReader inputStream) throws IOException {
+    protected Flux<BulkOperation> source(RunContext runContext, InputStream inputStream) throws IOException {
         return Flux
-            .create(this.fileReader(inputStream), FluxSink.OverflowStrategy.BUFFER);
+            .create(this.fileReader(new BufferedReader(new InputStreamReader(inputStream))), FluxSink.OverflowStrategy.BUFFER);
     }
 
     @SuppressWarnings("unchecked")
