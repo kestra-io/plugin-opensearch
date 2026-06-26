@@ -70,7 +70,7 @@ import lombok.experimental.SuperBuilder;
                     method: "GET"
                     endpoint: "my_index/_search"
                     parameters:
-                      q: "name:\"John Doe\""
+                      q: 'name:"John Doe"'
                 """
         ),
         @Example(
@@ -168,7 +168,10 @@ public class Request extends AbstractTask implements RunnableTask<Request.Output
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
+        @Schema(title = "HTTP status code returned by OpenSearch")
         private Integer status;
+
+        @Schema(title = "Response body returned by OpenSearch")
         private Object response;
     }
 }
