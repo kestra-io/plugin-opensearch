@@ -108,6 +108,7 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
+        @Schema(title = "The document retrieved from OpenSearch")
         private Map<String, Object> row;
     }
 }
