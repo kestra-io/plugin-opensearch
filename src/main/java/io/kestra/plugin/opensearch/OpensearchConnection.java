@@ -63,7 +63,7 @@ public class OpensearchConnection {
         title = "Additional HTTP headers",
         description = "Each entry is `Key:Value`, e.g. `Authorization: Token XYZ`; rendered per request."
     )
-    @PluginProperty(group = "advanced")
+    @PluginProperty(secret = true, group = "advanced")
     private Property<List<String>> headers;
 
     @Schema(
@@ -82,7 +82,8 @@ public class OpensearchConnection {
 
     @Schema(
         title = "Trust all SSL certificates",
-        description = "Disables TLS verification for self-signed clusters; insecure, use only in trusted networks."
+        description = "INSECURE — disables TLS certificate and hostname verification entirely, allowing man-in-the-middle attacks. " +
+            "Must never be used against production clusters or over untrusted networks. Prefer supplying a trusted CA certificate/trust store instead."
     )
     @PluginProperty(group = "advanced")
     private Property<Boolean> trustAllSsl;
@@ -147,6 +148,12 @@ public class OpensearchConnection {
         }
 
         if (Boolean.TRUE.equals(runContext.render(trustAllSsl).as(Boolean.class).orElse(false))) {
+            runContext.logger().warn(
+                "trustAllSsl=true: TLS certificate and hostname verification are DISABLED for this OpenSearch connection. " +
+                "This is INSECURE and must never be used against production clusters or over untrusted networks, " +
+                "as it allows man-in-the-middle attacks. Prefer supplying a trusted CA certificate/trust store instead."
+            );
+
             SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
             sslContextBuilder.loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true);
             SSLContext sslContext = sslContextBuilder.build();
