@@ -49,12 +49,12 @@ import static io.kestra.core.utils.Rethrow.throwConsumer;
             full = true,
             title = "Send a preformatted Bulk API file (action + source lines).",
             code = """
-                    id: opensearch_bulk_load
-                    namespace: company.team
+                id: opensearch_bulk_load
+                namespace: company.team
 
-                    inputs:
-                      - id: file
-                        type: FILE
+                inputs:
+                  - id: file
+                    type: FILE
 
                 tasks:
                   - id: bulk_load
