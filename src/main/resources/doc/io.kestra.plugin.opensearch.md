@@ -4,7 +4,7 @@ Search, index, bulk-load, and query OpenSearch clusters from Kestra flows.
 
 ## Authentication
 
-Set `connection.hosts` to a list of OpenSearch node URLs (e.g. `["http://localhost:9200"]`). For basic auth, set `connection.basicAuth.username` and `connection.basicAuth.password`. Set `connection.trustAllSsl: true` for self-signed certificates. Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and apply connection properties globally with [plugin defaults](https://kestra.io/docs/workflow-components/plugin-defaults).
+Set `connection.hosts` to a list of OpenSearch node URLs (e.g. `["http://localhost:9200"]`). For basic auth, set `connection.basicAuth.username` and `connection.basicAuth.password`. Set `connection.trustAllSsl: true` for self-signed certificates. Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and set connection properties on each task.
 
 ## Tasks
 
