@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
-import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.utils.IdUtils;
 import io.kestra.plugin.opensearch.model.HttpMethod;
+import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;

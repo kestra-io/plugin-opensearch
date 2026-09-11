@@ -3,19 +3,18 @@ package io.kestra.plugin.opensearch;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
-import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 import io.kestra.core.models.tasks.common.FetchType;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.storages.StorageInterface;
 import io.kestra.core.tenant.TenantService;
+import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;
@@ -103,8 +102,13 @@ class PplTest {
         assertThat(output.getRows(), nullValue());
 
         long lines;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-            storageInterface.get(TenantService.MAIN_TENANT, null, output.getUri())))) {
+        try (
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                    storageInterface.get(TenantService.MAIN_TENANT, null, output.getUri())
+                )
+            )
+        ) {
             lines = reader.lines().count();
         }
         assertThat((int) lines, is(output.getSize()));
