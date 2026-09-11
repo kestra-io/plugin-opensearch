@@ -53,12 +53,7 @@ dependencies {
     compileOnly group: "io.kestra", name: "script", version: kestraVersion
 
     // Libs
-    api (group: 'org.opensearch.client', name: 'opensearch-java') {
-        exclude group: 'org.apache.logging.log4j'
-    }
-    api (group: 'org.opensearch.client', name: 'opensearch-rest-client') {
-        exclude group: 'org.apache.logging.log4j'
-    }
+    implementation 'io.kestra.plugin:plugin-opensearch-lib:1.0.0-SNAPSHOT'
 }
 
 

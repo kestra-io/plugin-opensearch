@@ -9,6 +9,7 @@ import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.opensearch.client.transport.endpoints.BooleanResponse;
 
 import io.kestra.core.models.property.Property;
+import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.storages.StorageInterface;

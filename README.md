@@ -46,7 +46,7 @@
 ## What
 
 - Provides plugin components under `io.kestra.plugin.opensearch`.
-- Includes classes such as `Request`, `Load`, `Scroll`, `OpensearchConnection`.
+- Includes classes such as `Request`, `Load`, `Scroll`.
 
 ## Documentation
 * Full documentation can be found under: [kestra.io/docs](https://kestra.io/docs)

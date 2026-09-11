@@ -2,6 +2,7 @@ package io.kestra.plugin.opensearch;
 
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.Task;
+import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
