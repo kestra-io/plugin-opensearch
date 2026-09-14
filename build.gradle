@@ -52,7 +52,7 @@ dependencies {
     compileOnly group: "io.kestra", name: "script", version: kestraVersion
 
     // Libs
-    api 'io.kestra.plugin:plugin-opensearch-lib:1.0.0-SNAPSHOT'
+    api 'io.kestra.plugin:plugin-opensearch-lib:1.0.0'
 }
 
 
