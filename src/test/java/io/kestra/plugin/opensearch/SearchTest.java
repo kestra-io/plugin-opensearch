@@ -17,6 +17,7 @@ import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.serializers.FileSerde;
 import io.kestra.core.storages.StorageInterface;
 import io.kestra.core.tenant.TenantService;
+import io.kestra.plugin.opensearch.shared.OpensearchConnection;
 
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;

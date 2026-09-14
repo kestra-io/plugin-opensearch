@@ -3,7 +3,8 @@
 ## What
 
 - Provides plugin components under `io.kestra.plugin.opensearch`.
-- Includes classes such as `Request`, `Load`, `Scroll`, `OpensearchConnection`.
+- Includes classes such as `Request`, `Load`, `Scroll`.
+- Connection handling (`OpensearchConnection`) and the bulk-execution pipeline (`BulkService`) live in the shared `plugin-opensearch-lib` dependency (`io.kestra.plugin.opensearch.shared`), consumed here as a regular Maven artifact — not bundled as source in this repo.
 
 ## Why
 
@@ -42,6 +43,12 @@ plugin-opensearch/
 ├── build.gradle
 └── README.md
 ```
+
+### Shared Lib Dependency
+
+- `io.kestra.plugin.opensearch.shared.OpensearchConnection` and `io.kestra.plugin.opensearch.shared.BulkService` come from `io.kestra.plugin:plugin-opensearch-lib`, published from a separate `plugin-opensearch-lib` repository.
+- The lib is **not** a loadable Kestra plugin (no tasks/triggers registered); it is a plain library dependency shared with `plugin-ee-opensearch`.
+- Any change to connection or bulk-execution behavior must land in `plugin-opensearch-lib` first, be released, and then have this plugin bump its `plugin-opensearch-lib` version — changes cannot be made directly in this repo.
 
 ## References
 
