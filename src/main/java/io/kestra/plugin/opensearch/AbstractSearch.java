@@ -48,11 +48,13 @@ public abstract class AbstractSearch extends AbstractTask {
 
     @Schema(
         title = "Payload content type",
-        description = "Format used to parse string requests; defaults to JSON."
+        description = "Deprecated and ignored: `request` must be a Map or a JSON string.",
+        deprecated = true
     )
     @Builder.Default
     @PluginProperty(group = "advanced")
-    private Property<XContentType> contentType = Property.ofValue(XContentType.JSON); //FIXME
+    @Deprecated
+    private Property<XContentType> contentType = Property.ofValue(XContentType.JSON);
 
     protected SearchRequest.Builder request(RunContext runContext, OpenSearchTransport transport) throws IllegalVariableEvaluationException, IOException {
         SearchRequest.Builder request;
