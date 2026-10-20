@@ -45,7 +45,6 @@ import lombok.experimental.SuperBuilder;
                         - "http://localhost:9200"
                     index: "my_index"
                     key: "my_id"
-                    docVersion: 1
                 """
         )
     }
@@ -67,10 +66,9 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
 
     @Schema(
         title = "Expected document version",
-        description = "Request fails if the cluster version differs; use for optimistic concurrency."
+        description = "Optional; request fails if the cluster version differs. Omit to retrieve the document without a version check."
     )
-    @NotNull
-    @PluginProperty(group = "main")
+    @PluginProperty(group = "advanced")
     private Property<Long> docVersion;
 
     @Override
