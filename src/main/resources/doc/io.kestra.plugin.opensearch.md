@@ -14,7 +14,7 @@ Set `connection.hosts` to a list of OpenSearch node URLs (e.g. `["http://localho
 
 `Put` indexes a single document — set `index` and `value` (a JSON string or map). Optionally set `key` to control the document ID and `opType` to choose between index and create semantics.
 
-`Get` retrieves a single document by `index`, `key`, and `docVersion`.
+`Get` retrieves a single document by `index` and `key`. Optionally set `docVersion` to fail when the stored document version differs, and `routing` to select the shard.
 
 `Request` sends a raw HTTP request to OpenSearch — set `endpoint` (required) and `method` (default `GET`). Pass query `parameters` and a `body` as needed.
 
