@@ -66,7 +66,10 @@ public class Get extends AbstractTask implements RunnableTask<Get.Output> {
 
     @Schema(
         title = "Expected document version",
-        description = "Optional; request fails if the cluster version differs. Omit to retrieve the document without a version check."
+        description = """
+            Request fails if the stored document version differs from this value.
+            Omit it to read the document without a version check.
+            """
     )
     @PluginProperty(group = "advanced")
     private Property<Long> docVersion;
