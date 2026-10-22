@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.bulk.CreateOperation;
+import org.opensearch.client.opensearch.core.bulk.DeleteOperation;
 import org.opensearch.client.opensearch.core.bulk.IndexOperation;
+import org.opensearch.client.opensearch.core.bulk.UpdateOperation;
 
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.Example;
@@ -23,8 +26,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 
-import static io.kestra.core.utils.Rethrow.throwFunction;
-
 @SuperBuilder
 @ToString
 @EqualsAndHashCode
@@ -32,7 +33,7 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
 @NoArgsConstructor
 @Schema(
     title = "Bulk load records from Internal Storage",
-    description = "Reads line-delimited JSON/ION from Kestra internal storage and indexes documents in batches."
+    description = "Reads line-delimited JSON/ION from Kestra internal storage and sends the records in batches as `INDEX`, `CREATE`, `UPDATE` or `DELETE` operations, depending on `opType`."
 )
 @Plugin(
     examples = {
@@ -55,6 +56,28 @@ import static io.kestra.core.utils.Rethrow.throwFunction;
                     from: "{{ inputs.file }}"
                     index: "my_index"
                 """
+        ),
+        @Example(
+            full = true,
+            code = """
+                id: opensearch_load_update
+                namespace: company.team
+
+                inputs:
+                  - id: file
+                    type: FILE
+
+                tasks:
+                  - id: update
+                    type: io.kestra.plugin.opensearch.Load
+                    connection:
+                      hosts:
+                        - "http://localhost:9200"
+                    from: "{{ inputs.file }}"
+                    index: "my_index"
+                    idKey: "id"
+                    opType: UPDATE
+                """
         )
     }
 )
@@ -69,14 +92,18 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
 
     @Schema(
         title = "Bulk operation type",
-        description = "Indexing op type; INDEX/CREATE supported, others rejected by client."
+        description = """
+            Bulk operation applied to each record: `INDEX` (default), `CREATE`, `UPDATE` (partial update, upserting the record if missing), or `DELETE`.
+            `CREATE` fails the task if a document with the same id already exists.
+            `UPDATE` and `DELETE` require `idKey`.
+            The load is not atomic: records are validated while streaming, so a failure on a bad record (e.g. a missing `idKey` field) can leave earlier chunks already applied."""
     )
     @PluginProperty(group = "advanced")
     private Property<OpType> opType;
 
     @Schema(
         title = "Field to use as document id",
-        description = "If set, uses this field value as `_id`; field is removed when `removeIdKey` is true."
+        description = "If set, uses this field value as `_id`; field is removed when `removeIdKey` is true. Required when `opType` is `UPDATE` or `DELETE`; optional otherwise (OpenSearch generates ids when unset)."
     )
     @PluginProperty(group = "connection")
     private Property<String> idKey;
@@ -92,36 +119,72 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
     @SuppressWarnings("unchecked")
     @Override
     protected Flux<BulkOperation> source(RunContext runContext, InputStream inputStream) throws IllegalVariableEvaluationException, IOException {
+        var index = runContext.render(this.index).as(String.class)
+            .orElseThrow(() -> new IllegalArgumentException("`index` is required"));
+        var opType = runContext.render(this.opType).as(OpType.class).orElse(OpType.INDEX);
+        var idKey = runContext.render(this.idKey).as(String.class).orElse(null);
+        var removeIdKey = runContext.render(this.removeIdKey).as(Boolean.class).orElse(true);
+
+        if (idKey == null && (opType == OpType.UPDATE || opType == OpType.DELETE)) {
+            throw new IllegalArgumentException("`idKey` is required when `opType` is " + opType);
+        }
+
         return FileSerde.readAll(inputStream)
-            .map(throwFunction(o ->
+            .map(o ->
             {
-                Map<String, ?> values = (Map<String, ?>) o;
+                var values = (Map<String, ?>) o;
 
-                var indexRequest = new IndexOperation.Builder<Map<String, ?>>();
-                if (this.index != null) {
-                    indexRequest.index(runContext.render(this.getIndex()).as(String.class).orElseThrow());
-                }
+                String id = null;
+                if (idKey != null) {
+                    var idValue = values.get(idKey);
+                    if (idValue == null) {
+                        throw new IllegalArgumentException("Record is missing idKey '" + idKey + "'; required for opType " + opType);
+                    }
+                    id = idValue.toString();
 
-                //FIXME
-                //                if (this.opType != null) {
-                //                    indexRequest.opType(this.opType.to());
-                //                }
-
-                if (this.idKey != null) {
-                    String idKey = runContext.render(this.idKey).as(String.class).orElseThrow();
-
-                    indexRequest.id(values.get(idKey).toString());
-
-                    if (Boolean.TRUE.equals(runContext.render(removeIdKey).as(Boolean.class).orElseThrow())) {
+                    if (removeIdKey) {
                         values.remove(idKey);
                     }
                 }
 
-                indexRequest.document(values);
+                return operation(opType, index, id, values);
+            });
+    }
 
-                var bulkOperation = new BulkOperation.Builder();
-                bulkOperation.index(indexRequest.build());
-                return bulkOperation.build();
-            }));
+    private static BulkOperation operation(OpType opType, String index, String id, Map<String, ?> values) {
+        var bulkOperation = new BulkOperation.Builder();
+
+        switch (opType) {
+            case INDEX -> bulkOperation.index(
+                new IndexOperation.Builder<Map<String, ?>>()
+                    .index(index)
+                    .id(id)
+                    .document(values)
+                    .build()
+            );
+            case CREATE -> bulkOperation.create(
+                new CreateOperation.Builder<Map<String, ?>>()
+                    .index(index)
+                    .id(id)
+                    .document(values)
+                    .build()
+            );
+            case UPDATE -> bulkOperation.update(
+                new UpdateOperation.Builder<Map<String, ?>>()
+                    .index(index)
+                    .id(id)
+                    .document(values)
+                    .docAsUpsert(true)
+                    .build()
+            );
+            case DELETE -> bulkOperation.delete(
+                new DeleteOperation.Builder()
+                    .index(index)
+                    .id(id)
+                    .build()
+            );
+        }
+
+        return bulkOperation.build();
     }
 }
