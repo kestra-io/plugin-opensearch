@@ -20,6 +20,6 @@ Set `connection.hosts` to a list of OpenSearch node URLs (e.g. `["http://localho
 
 `Bulk` performs bulk operations from a file in internal storage — set `from` to a `kestra://` URI. Control batch size with `chunk` (default 1000).
 
-`Load` bulk-indexes documents from a file — set `from`, `index`, and optionally `idKey` to use a field as the document ID (set `removeIdKey: true`, the default, to strip it from the indexed document).
+`Load` bulk-indexes documents from a file — set `from`, `index`, and optionally `idKey` to use a field as the document ID (set `removeIdKey: true`, the default, to strip it from the indexed document). Set `opType` to `INDEX` (default), `CREATE`, `UPDATE` (partial update, upserting missing documents) or `DELETE`. `UPDATE` and `DELETE` require `idKey`.
 
 `Ppl` runs an OpenSearch PPL query set in `query`. Control result handling with `fetchType` (default `FETCH`) and response format with `format` (`JDBC` by default, also `CSV` or `RAW`).
