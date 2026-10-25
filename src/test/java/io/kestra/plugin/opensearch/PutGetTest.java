@@ -84,7 +84,7 @@ class PutGetTest {
 
         var put = Put.builder()
             .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
-            .index(Property.ofValue("ut_" + IdUtils.create().toLowerCase(Locale.ROOT)))
+            .index(Property.ofValue("ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT))))
             .opType(Property.ofValue(OpType.UPDATE))
             .value(Map.of("name", "John Doe"))
             .build();

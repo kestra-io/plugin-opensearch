@@ -94,9 +94,9 @@ class BulkTest {
     @Test
     void duplicateCreate_fails() throws Exception {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
-        var tempFile = File.createTempFile(this.getClass().getSimpleName().toLowerCase() + "_", ".trs");
+        var tempFile = File.createTempFile("%s_".formatted(this.getClass().getSimpleName().toLowerCase()), ".trs");
         try (OutputStream output = new FileOutputStream(tempFile)) {
             List.of(
                 Map.of("create", Map.of("_index", indice, "_id", "1")),
@@ -107,16 +107,14 @@ class BulkTest {
                 .forEach(
                     throwConsumer(
                         s -> output.write(
-                            (JacksonMapper
-                                .ofJson()
-                                .writeValueAsString(s) + "\n")
+                            "%s\n".formatted(JacksonMapper.ofJson().writeValueAsString(s))
                                 .getBytes(StandardCharsets.UTF_8)
                         )
                     )
                 );
         }
 
-        var uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
+        var uri = storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/%s.ion".formatted(IdUtils.create())), new FileInputStream(tempFile));
 
         var bulk = Bulk.builder()
             .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())

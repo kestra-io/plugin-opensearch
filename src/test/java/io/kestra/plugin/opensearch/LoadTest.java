@@ -80,7 +80,7 @@ class LoadTest {
     @Test
     void opTypes() throws Exception {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
         var created = load(
             runContext, indice, OpType.CREATE, List.of(
@@ -111,7 +111,7 @@ class LoadTest {
     @Test
     void indexOverwritesExistingDocument() throws Exception {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
         load(runContext, indice, OpType.INDEX, List.of(Map.of("id", "1", "name", "john", "city", "Paris")));
         load(runContext, indice, OpType.INDEX, List.of(Map.of("id", "1", "name", "johnny")));
@@ -124,7 +124,7 @@ class LoadTest {
     @Test
     void createOnExistingId_fails() throws Exception {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
         load(runContext, indice, OpType.CREATE, List.of(Map.of("id", "1", "name", "john")));
 
@@ -139,7 +139,7 @@ class LoadTest {
     @Test
     void updateUpsertsMissingDocument() throws Exception {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
         load(runContext, indice, OpType.UPDATE, List.of(Map.of("id", "1", "name", "john")));
 
@@ -149,7 +149,7 @@ class LoadTest {
     @Test
     void recordWithoutIdKey_throws() {
         var runContext = runContextFactory.of();
-        var indice = "ut_" + IdUtils.create().toLowerCase(Locale.ROOT);
+        var indice = "ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT));
 
         var e = assertThrows(
             IllegalArgumentException.class,
@@ -164,7 +164,7 @@ class LoadTest {
 
         var load = Load.builder()
             .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
-            .index(Property.ofValue("ut_" + IdUtils.create().toLowerCase(Locale.ROOT)))
+            .index(Property.ofValue("ut_%s".formatted(IdUtils.create().toLowerCase(Locale.ROOT))))
             .from(Property.ofValue(upload(List.of(Map.of("id", "1"))).toString()))
             .opType(Property.ofValue(OpType.DELETE))
             .build();
@@ -195,12 +195,12 @@ class LoadTest {
     }
 
     private URI upload(List<Map<String, Object>> rows) throws Exception {
-        var tempFile = File.createTempFile(this.getClass().getSimpleName().toLowerCase() + "_", ".trs");
+        var tempFile = File.createTempFile("%s_".formatted(this.getClass().getSimpleName().toLowerCase()), ".trs");
         try (OutputStream output = new FileOutputStream(tempFile)) {
             for (var row : rows) {
                 FileSerde.write(output, row);
             }
         }
-        return storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/" + IdUtils.create() + ".ion"), new FileInputStream(tempFile));
+        return storageInterface.put(TenantService.MAIN_TENANT, null, URI.create("/%s.ion".formatted(IdUtils.create())), new FileInputStream(tempFile));
     }
 }

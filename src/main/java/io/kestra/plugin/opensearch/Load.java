@@ -119,14 +119,14 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
     @SuppressWarnings("unchecked")
     @Override
     protected Flux<BulkOperation> source(RunContext runContext, InputStream inputStream) throws IllegalVariableEvaluationException, IOException {
-        var index = runContext.render(this.index).as(String.class)
+        var rIndex = runContext.render(this.index).as(String.class)
             .orElseThrow(() -> new IllegalArgumentException("`index` is required"));
-        var opType = runContext.render(this.opType).as(OpType.class).orElse(OpType.INDEX);
-        var idKey = runContext.render(this.idKey).as(String.class).orElse(null);
-        var removeIdKey = runContext.render(this.removeIdKey).as(Boolean.class).orElse(true);
+        var rOpType = runContext.render(this.opType).as(OpType.class).orElse(OpType.INDEX);
+        var rIdKey = runContext.render(this.idKey).as(String.class).orElse(null);
+        var rRemoveIdKey = runContext.render(this.removeIdKey).as(Boolean.class).orElse(true);
 
-        if (idKey == null && (opType == OpType.UPDATE || opType == OpType.DELETE)) {
-            throw new IllegalArgumentException("`idKey` is required when `opType` is " + opType);
+        if (rIdKey == null && (rOpType == OpType.UPDATE || rOpType == OpType.DELETE)) {
+            throw new IllegalArgumentException("`idKey` is required when `opType` is %s".formatted(rOpType));
         }
 
         return FileSerde.readAll(inputStream)
@@ -135,19 +135,19 @@ public class Load extends AbstractLoad implements RunnableTask<Load.Output> {
                 var values = (Map<String, ?>) o;
 
                 String id = null;
-                if (idKey != null) {
-                    var idValue = values.get(idKey);
+                if (rIdKey != null) {
+                    var idValue = values.get(rIdKey);
                     if (idValue == null) {
-                        throw new IllegalArgumentException("Record is missing idKey '" + idKey + "'; required for opType " + opType);
+                        throw new IllegalArgumentException("Record is missing idKey '%s'; required for opType %s".formatted(rIdKey, rOpType));
                     }
                     id = idValue.toString();
 
-                    if (removeIdKey) {
-                        values.remove(idKey);
+                    if (rRemoveIdKey) {
+                        values.remove(rIdKey);
                     }
                 }
 
-                return operation(opType, index, id, values);
+                return operation(rOpType, rIndex, id, values);
             });
     }
 

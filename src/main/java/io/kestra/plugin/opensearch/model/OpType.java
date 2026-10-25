@@ -11,7 +11,7 @@ public enum OpType {
             case INDEX -> org.opensearch.client.opensearch._types.OpType.Index;
             case CREATE -> org.opensearch.client.opensearch._types.OpType.Create;
             case UPDATE, DELETE -> throw new IllegalArgumentException(
-                "opType " + this + " is not supported for a single-document request, only INDEX and CREATE are; use Load or Bulk for UPDATE and DELETE"
+                "opType %s is not supported for a single-document request, only INDEX and CREATE are; use Load or Bulk for UPDATE and DELETE".formatted(this)
             );
         };
     }
