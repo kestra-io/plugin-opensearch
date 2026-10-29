@@ -25,6 +25,7 @@ import jakarta.inject.Inject;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 @KestraTest
 class SearchTest {
@@ -63,6 +64,31 @@ class SearchTest {
 
         assertThat(run.getSize(), is(1));
         assertThat(run.getRows().get(0).get("genericName"), is("Larus"));
+    }
+
+    @Test
+    void runWithoutTrackTotalHits() throws Exception {
+        RunContext runContext = runContextFactory.of();
+
+        Search task = Search.builder()
+            .connection(OpensearchConnection.builder().hosts(Property.ofValue(hosts)).build())
+            .indexes(Property.ofValue(Collections.singletonList("gbif")))
+            .request("""
+                {
+                    "track_total_hits": false,
+                    "query": {
+                        "term": {
+                            "key": "925277090"
+                        }
+                    }
+                }""")
+            .build();
+
+        Search.Output run = task.run(runContext);
+
+        assertThat(run.getSize(), is(1));
+        assertThat(run.getRows().get(0).get("genericName"), is("Larus"));
+        assertThat(run.getTotal(), nullValue());
     }
 
     @Test
