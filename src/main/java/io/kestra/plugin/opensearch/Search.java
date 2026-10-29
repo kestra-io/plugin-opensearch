@@ -169,7 +169,8 @@ public class Search extends AbstractSearch implements RunnableTask<Search.Output
         private Integer size;
 
         @Schema(
-            title = "Total hits without pagination"
+            title = "Total hits without pagination",
+            description = "Empty when the request sets `track_total_hits: false`, because OpenSearch then leaves `hits.total` out of the response."
         )
         private Long total;
 
